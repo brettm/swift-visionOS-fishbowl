@@ -1,0 +1,576 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		8BBA2B702B98F94000ECA666 /* RealityKitContent in Frameworks */ = {isa = PBXBuildFile; productRef = 8BBA2B6F2B98F94000ECA666 /* RealityKitContent */; };
+		8BBA2B722B98F94000ECA666 /* FishBowlApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BBA2B712B98F94000ECA666 /* FishBowlApp.swift */; };
+		8BBA2B742B98F94000ECA666 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BBA2B732B98F94000ECA666 /* ContentView.swift */; };
+		8BBA2B762B98F94000ECA666 /* ImmersiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BBA2B752B98F94000ECA666 /* ImmersiveView.swift */; };
+		8BBA2B782B98F94000ECA666 /* ImageBasedLighting.skybox in Resources */ = {isa = PBXBuildFile; fileRef = 8BBA2B772B98F94000ECA666 /* ImageBasedLighting.skybox */; };
+		8BBA2B7A2B98F94900ECA666 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8BBA2B792B98F94900ECA666 /* Assets.xcassets */; };
+		8BBA2B7D2B98F94900ECA666 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8BBA2B7C2B98F94900ECA666 /* Preview Assets.xcassets */; };
+		8BBA2B882B98F94900ECA666 /* FishBowlTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BBA2B872B98F94900ECA666 /* FishBowlTests.swift */; };
+		8BF3CCAA2B99E75B000DE9C8 /* fish_clown in Resources */ = {isa = PBXBuildFile; fileRef = 8BF3CCA92B99E75B000DE9C8 /* fish_clown */; };
+		8BF3CCAC2B99EA51000DE9C8 /* VectorMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF3CCAB2B99EA50000DE9C8 /* VectorMath.swift */; };
+		8BF3CCB12B99FF50000DE9C8 /* MotionComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF3CCB02B99FF50000DE9C8 /* MotionComponent.swift */; };
+		8BF3CCB42B9A0163000DE9C8 /* MotionSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF3CCB32B9A0163000DE9C8 /* MotionSystem.swift */; };
+		8BF3CCB62B9A0344000DE9C8 /* WanderComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF3CCB52B9A0344000DE9C8 /* WanderComponent.swift */; };
+		8BF3CCB82B9A0373000DE9C8 /* WanderSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF3CCB72B9A0373000DE9C8 /* WanderSystem.swift */; };
+		8BF3CCBA2B9A0470000DE9C8 /* Entity+Distance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF3CCB92B9A0470000DE9C8 /* Entity+Distance.swift */; };
+		8BF3CCBC2B9A2267000DE9C8 /* AnimationSpeedSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF3CCBB2B9A2267000DE9C8 /* AnimationSpeedSystem.swift */; };
+		8BF3CCBE2B9A227C000DE9C8 /* AnimationSpeedComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF3CCBD2B9A227C000DE9C8 /* AnimationSpeedComponent.swift */; };
+		8BF3CCC02B9B08C7000DE9C8 /* FlockingSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF3CCBF2B9B08C7000DE9C8 /* FlockingSystem.swift */; };
+		8BF3CCC22B9B5B78000DE9C8 /* HungerSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF3CCC12B9B5B78000DE9C8 /* HungerSystem.swift */; };
+		8BF3CCC42B9F42CC000DE9C8 /* krill.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 8BF3CCC32B9F42CC000DE9C8 /* krill.usdz */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		8BBA2B842B98F94900ECA666 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BBA2B622B98F94000ECA666 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8BBA2B692B98F94000ECA666;
+			remoteInfo = HoloDeck;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		8BBA2B6A2B98F94000ECA666 /* FishBowl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FishBowl.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8BBA2B6E2B98F94000ECA666 /* RealityKitContent */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = RealityKitContent; sourceTree = "<group>"; };
+		8BBA2B712B98F94000ECA666 /* FishBowlApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FishBowlApp.swift; sourceTree = "<group>"; };
+		8BBA2B732B98F94000ECA666 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		8BBA2B752B98F94000ECA666 /* ImmersiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImmersiveView.swift; sourceTree = "<group>"; };
+		8BBA2B772B98F94000ECA666 /* ImageBasedLighting.skybox */ = {isa = PBXFileReference; lastKnownFileType = file.skybox; path = ImageBasedLighting.skybox; sourceTree = "<group>"; };
+		8BBA2B792B98F94900ECA666 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		8BBA2B7C2B98F94900ECA666 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		8BBA2B7E2B98F94900ECA666 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8BBA2B832B98F94900ECA666 /* FishBowlTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FishBowlTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8BBA2B872B98F94900ECA666 /* FishBowlTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FishBowlTests.swift; sourceTree = "<group>"; };
+		8BF3CCA92B99E75B000DE9C8 /* fish_clown */ = {isa = PBXFileReference; lastKnownFileType = folder; path = fish_clown; sourceTree = "<group>"; };
+		8BF3CCAB2B99EA50000DE9C8 /* VectorMath.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VectorMath.swift; sourceTree = "<group>"; };
+		8BF3CCB02B99FF50000DE9C8 /* MotionComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MotionComponent.swift; sourceTree = "<group>"; };
+		8BF3CCB32B9A0163000DE9C8 /* MotionSystem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MotionSystem.swift; sourceTree = "<group>"; };
+		8BF3CCB52B9A0344000DE9C8 /* WanderComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WanderComponent.swift; sourceTree = "<group>"; };
+		8BF3CCB72B9A0373000DE9C8 /* WanderSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WanderSystem.swift; sourceTree = "<group>"; };
+		8BF3CCB92B9A0470000DE9C8 /* Entity+Distance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Entity+Distance.swift"; sourceTree = "<group>"; };
+		8BF3CCBB2B9A2267000DE9C8 /* AnimationSpeedSystem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnimationSpeedSystem.swift; sourceTree = "<group>"; };
+		8BF3CCBD2B9A227C000DE9C8 /* AnimationSpeedComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationSpeedComponent.swift; sourceTree = "<group>"; };
+		8BF3CCBF2B9B08C7000DE9C8 /* FlockingSystem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlockingSystem.swift; sourceTree = "<group>"; };
+		8BF3CCC12B9B5B78000DE9C8 /* HungerSystem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HungerSystem.swift; sourceTree = "<group>"; };
+		8BF3CCC32B9F42CC000DE9C8 /* krill.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = krill.usdz; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8BBA2B672B98F94000ECA666 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8BBA2B702B98F94000ECA666 /* RealityKitContent in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8BBA2B802B98F94900ECA666 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		8BBA2B612B98F94000ECA666 = {
+			isa = PBXGroup;
+			children = (
+				8BBA2B6C2B98F94000ECA666 /* FishBowl */,
+				8BBA2B6D2B98F94000ECA666 /* Packages */,
+				8BBA2B862B98F94900ECA666 /* FishBowlTests */,
+				8BBA2B6B2B98F94000ECA666 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		8BBA2B6B2B98F94000ECA666 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8BBA2B6A2B98F94000ECA666 /* FishBowl.app */,
+				8BBA2B832B98F94900ECA666 /* FishBowlTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8BBA2B6C2B98F94000ECA666 /* FishBowl */ = {
+			isa = PBXGroup;
+			children = (
+				8BF3CCB22B9A0158000DE9C8 /* Systems */,
+				8BF3CCAD2B99F9AE000DE9C8 /* Components */,
+				8BF3CCA82B99E750000DE9C8 /* Resources */,
+				8BBA2B712B98F94000ECA666 /* FishBowlApp.swift */,
+				8BBA2B732B98F94000ECA666 /* ContentView.swift */,
+				8BBA2B752B98F94000ECA666 /* ImmersiveView.swift */,
+				8BF3CCAB2B99EA50000DE9C8 /* VectorMath.swift */,
+				8BF3CCB92B9A0470000DE9C8 /* Entity+Distance.swift */,
+				8BBA2B772B98F94000ECA666 /* ImageBasedLighting.skybox */,
+				8BBA2B792B98F94900ECA666 /* Assets.xcassets */,
+				8BBA2B7E2B98F94900ECA666 /* Info.plist */,
+				8BBA2B7B2B98F94900ECA666 /* Preview Content */,
+			);
+			path = FishBowl;
+			sourceTree = "<group>";
+		};
+		8BBA2B6D2B98F94000ECA666 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				8BBA2B6E2B98F94000ECA666 /* RealityKitContent */,
+			);
+			path = Packages;
+			sourceTree = "<group>";
+		};
+		8BBA2B7B2B98F94900ECA666 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				8BBA2B7C2B98F94900ECA666 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		8BBA2B862B98F94900ECA666 /* FishBowlTests */ = {
+			isa = PBXGroup;
+			children = (
+				8BBA2B872B98F94900ECA666 /* FishBowlTests.swift */,
+			);
+			path = FishBowlTests;
+			sourceTree = "<group>";
+		};
+		8BF3CCA82B99E750000DE9C8 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				8BF3CCC32B9F42CC000DE9C8 /* krill.usdz */,
+				8BF3CCA92B99E75B000DE9C8 /* fish_clown */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		8BF3CCAD2B99F9AE000DE9C8 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				8BF3CCB02B99FF50000DE9C8 /* MotionComponent.swift */,
+				8BF3CCB52B9A0344000DE9C8 /* WanderComponent.swift */,
+				8BF3CCBD2B9A227C000DE9C8 /* AnimationSpeedComponent.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		8BF3CCB22B9A0158000DE9C8 /* Systems */ = {
+			isa = PBXGroup;
+			children = (
+				8BF3CCB32B9A0163000DE9C8 /* MotionSystem.swift */,
+				8BF3CCB72B9A0373000DE9C8 /* WanderSystem.swift */,
+				8BF3CCBB2B9A2267000DE9C8 /* AnimationSpeedSystem.swift */,
+				8BF3CCBF2B9B08C7000DE9C8 /* FlockingSystem.swift */,
+				8BF3CCC12B9B5B78000DE9C8 /* HungerSystem.swift */,
+			);
+			path = Systems;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8BBA2B692B98F94000ECA666 /* FishBowl */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8BBA2B8B2B98F94900ECA666 /* Build configuration list for PBXNativeTarget "FishBowl" */;
+			buildPhases = (
+				8BBA2B662B98F94000ECA666 /* Sources */,
+				8BBA2B672B98F94000ECA666 /* Frameworks */,
+				8BBA2B682B98F94000ECA666 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FishBowl;
+			packageProductDependencies = (
+				8BBA2B6F2B98F94000ECA666 /* RealityKitContent */,
+			);
+			productName = HoloDeck;
+			productReference = 8BBA2B6A2B98F94000ECA666 /* FishBowl.app */;
+			productType = "com.apple.product-type.application";
+		};
+		8BBA2B822B98F94900ECA666 /* FishBowlTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8BBA2B8E2B98F94900ECA666 /* Build configuration list for PBXNativeTarget "FishBowlTests" */;
+			buildPhases = (
+				8BBA2B7F2B98F94900ECA666 /* Sources */,
+				8BBA2B802B98F94900ECA666 /* Frameworks */,
+				8BBA2B812B98F94900ECA666 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8BBA2B852B98F94900ECA666 /* PBXTargetDependency */,
+			);
+			name = FishBowlTests;
+			productName = HoloDeckTests;
+			productReference = 8BBA2B832B98F94900ECA666 /* FishBowlTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		8BBA2B622B98F94000ECA666 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1520;
+				LastUpgradeCheck = 1520;
+				TargetAttributes = {
+					8BBA2B692B98F94000ECA666 = {
+						CreatedOnToolsVersion = 15.2;
+					};
+					8BBA2B822B98F94900ECA666 = {
+						CreatedOnToolsVersion = 15.2;
+						TestTargetID = 8BBA2B692B98F94000ECA666;
+					};
+				};
+			};
+			buildConfigurationList = 8BBA2B652B98F94000ECA666 /* Build configuration list for PBXProject "FishBowl" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 8BBA2B612B98F94000ECA666;
+			productRefGroup = 8BBA2B6B2B98F94000ECA666 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8BBA2B692B98F94000ECA666 /* FishBowl */,
+				8BBA2B822B98F94900ECA666 /* FishBowlTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8BBA2B682B98F94000ECA666 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8BF3CCAA2B99E75B000DE9C8 /* fish_clown in Resources */,
+				8BBA2B7A2B98F94900ECA666 /* Assets.xcassets in Resources */,
+				8BBA2B7D2B98F94900ECA666 /* Preview Assets.xcassets in Resources */,
+				8BF3CCC42B9F42CC000DE9C8 /* krill.usdz in Resources */,
+				8BBA2B782B98F94000ECA666 /* ImageBasedLighting.skybox in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8BBA2B812B98F94900ECA666 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8BBA2B662B98F94000ECA666 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8BF3CCBE2B9A227C000DE9C8 /* AnimationSpeedComponent.swift in Sources */,
+				8BF3CCB12B99FF50000DE9C8 /* MotionComponent.swift in Sources */,
+				8BF3CCBC2B9A2267000DE9C8 /* AnimationSpeedSystem.swift in Sources */,
+				8BF3CCAC2B99EA51000DE9C8 /* VectorMath.swift in Sources */,
+				8BF3CCC22B9B5B78000DE9C8 /* HungerSystem.swift in Sources */,
+				8BBA2B742B98F94000ECA666 /* ContentView.swift in Sources */,
+				8BF3CCB82B9A0373000DE9C8 /* WanderSystem.swift in Sources */,
+				8BF3CCB62B9A0344000DE9C8 /* WanderComponent.swift in Sources */,
+				8BF3CCBA2B9A0470000DE9C8 /* Entity+Distance.swift in Sources */,
+				8BBA2B722B98F94000ECA666 /* FishBowlApp.swift in Sources */,
+				8BF3CCC02B9B08C7000DE9C8 /* FlockingSystem.swift in Sources */,
+				8BF3CCB42B9A0163000DE9C8 /* MotionSystem.swift in Sources */,
+				8BBA2B762B98F94000ECA666 /* ImmersiveView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8BBA2B7F2B98F94900ECA666 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8BBA2B882B98F94900ECA666 /* FishBowlTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		8BBA2B852B98F94900ECA666 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8BBA2B692B98F94000ECA666 /* FishBowl */;
+			targetProxy = 8BBA2B842B98F94900ECA666 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		8BBA2B892B98F94900ECA666 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = xros;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				XROS_DEPLOYMENT_TARGET = 1.0;
+			};
+			name = Debug;
+		};
+		8BBA2B8A2B98F94900ECA666 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = xros;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+				XROS_DEPLOYMENT_TARGET = 1.0;
+			};
+			name = Release;
+		};
+		8BBA2B8C2B98F94900ECA666 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"FishBowl/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "$(TARGET_NAME)/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.brettm.FishBowl;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "xros xrsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+			};
+			name = Debug;
+		};
+		8BBA2B8D2B98F94900ECA666 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"FishBowl/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "$(TARGET_NAME)/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.brettm.FishBowl;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "xros xrsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+			};
+			name = Release;
+		};
+		8BBA2B8F2B98F94900ECA666 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.brettm.HoloDeckTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "xros xrsimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FishBowl.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FishBowl";
+				XROS_DEPLOYMENT_TARGET = 1.0;
+			};
+			name = Debug;
+		};
+		8BBA2B902B98F94900ECA666 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.brettm.HoloDeckTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "xros xrsimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FishBowl.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FishBowl";
+				XROS_DEPLOYMENT_TARGET = 1.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8BBA2B652B98F94000ECA666 /* Build configuration list for PBXProject "FishBowl" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8BBA2B892B98F94900ECA666 /* Debug */,
+				8BBA2B8A2B98F94900ECA666 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8BBA2B8B2B98F94900ECA666 /* Build configuration list for PBXNativeTarget "FishBowl" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8BBA2B8C2B98F94900ECA666 /* Debug */,
+				8BBA2B8D2B98F94900ECA666 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8BBA2B8E2B98F94900ECA666 /* Build configuration list for PBXNativeTarget "FishBowlTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8BBA2B8F2B98F94900ECA666 /* Debug */,
+				8BBA2B902B98F94900ECA666 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8BBA2B6F2B98F94000ECA666 /* RealityKitContent */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = RealityKitContent;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 8BBA2B622B98F94000ECA666 /* Project object */;
+}
