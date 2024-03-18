@@ -27,6 +27,7 @@
 		8BF3CCC02B9B08C7000DE9C8 /* FlockingSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF3CCBF2B9B08C7000DE9C8 /* FlockingSystem.swift */; };
 		8BF3CCC22B9B5B78000DE9C8 /* HungerSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF3CCC12B9B5B78000DE9C8 /* HungerSystem.swift */; };
 		8BF3CCC42B9F42CC000DE9C8 /* krill.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 8BF3CCC32B9F42CC000DE9C8 /* krill.usdz */; };
+		8BF3CCC62BA0ACA0000DE9C8 /* ModelFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF3CCC52BA0ACA0000DE9C8 /* ModelFactory.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +64,7 @@
 		8BF3CCBF2B9B08C7000DE9C8 /* FlockingSystem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlockingSystem.swift; sourceTree = "<group>"; };
 		8BF3CCC12B9B5B78000DE9C8 /* HungerSystem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HungerSystem.swift; sourceTree = "<group>"; };
 		8BF3CCC32B9F42CC000DE9C8 /* krill.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = krill.usdz; sourceTree = "<group>"; };
+		8BF3CCC52BA0ACA0000DE9C8 /* ModelFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelFactory.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,6 +108,7 @@
 		8BBA2B6C2B98F94000ECA666 /* FishBowl */ = {
 			isa = PBXGroup;
 			children = (
+				8BF3CCC52BA0ACA0000DE9C8 /* ModelFactory.swift */,
 				8BF3CCB22B9A0158000DE9C8 /* Systems */,
 				8BF3CCAD2B99F9AE000DE9C8 /* Components */,
 				8BF3CCA82B99E750000DE9C8 /* Resources */,
@@ -285,6 +288,7 @@
 			files = (
 				8BF3CCBE2B9A227C000DE9C8 /* AnimationSpeedComponent.swift in Sources */,
 				8BF3CCB12B99FF50000DE9C8 /* MotionComponent.swift in Sources */,
+				8BF3CCC62BA0ACA0000DE9C8 /* ModelFactory.swift in Sources */,
 				8BF3CCBC2B9A2267000DE9C8 /* AnimationSpeedSystem.swift in Sources */,
 				8BF3CCAC2B99EA51000DE9C8 /* VectorMath.swift in Sources */,
 				8BF3CCC22B9B5B78000DE9C8 /* HungerSystem.swift in Sources */,

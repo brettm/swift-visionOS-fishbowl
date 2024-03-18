@@ -9,53 +9,6 @@ import RealityKit
 import RealityKitContent
 import ARKit
 
-enum EntityFactory {
-    static func makeEntities(count: Int, named name: String) async throws -> [Entity] {
-        var entities: [Entity] = []
-        let entity = try await Entity(named: name)
-        entities.append(entity)
-        for _ in 0..<count {
-            let clone = await entity.clone(recursive: true)
-            entities.append(clone)
-        }
-        return entities
-    }
-}
-
-enum FishFactory {
-    static func makeFish(count: Int, named name: String) async throws -> [Entity] {
-        var fish = try! await EntityFactory.makeEntities(count: count, named: name)
-        return Self.addComponents(entities: fish)
-    }
-    static private func addComponents(entities: [Entity]) -> [Entity] {
-        return entities.map { entity in
-            entity.components[MotionComponent.self] = MotionComponent()
-            entity.components[WanderComponent.self] = WanderComponent()
-            entity.components[FlockingComponent.self] = FlockingComponent()
-            if let anim = entity.availableAnimations.first {
-                entity.components[AnimationSpeedComponent.self] = AnimationSpeedComponent(animationController: entity.playAnimation(anim.repeat()))
-            }
-            return entity
-        }
-    }
-}
-
-enum FoodFactory {
-    static func makeKrill(count: Int = 1) async throws -> [Entity] {
-        var krill = try! await EntityFactory.makeEntities(count: count, named: "krill")
-        return Self.addComponents(entities: krill)
-    }
-    
-    static private func addComponents(entities: [Entity]) -> [Entity] {
-        return entities.map { entity in
-            entity.components[FoodComponent.self] = FoodComponent()
-            if let anim = entity.availableAnimations.first {
-                entity.components[AnimationSpeedComponent.self] = AnimationSpeedComponent(animationController: entity.playAnimation(anim.repeat()))
-            }
-            return entity
-        }
-    }
-}
 
 @Observable class VisionPro {
     let session = ARKitSession()
@@ -72,12 +25,15 @@ enum FoodFactory {
     }
 }
 
+
 struct ImmersiveView: View {
+    
     @State var foodAnchor: Entity = AnchorEntity(world: .zero)
     @State var tapAnchor: Entity = AnchorEntity(world: .zero)
     @State var worldTransform: simd_float4x4 = .init()
     
     let visionPro = VisionPro()
+    let modelFactory = ModelFactory()
     
     var body: some View {
         RealityView { content in
@@ -117,7 +73,7 @@ struct ImmersiveView: View {
                 immersiveContentEntity.addChild(fishAnchor)
                 
                 var fishCount = 100
-                var fishes = try! await FishFactory.makeFish(count: fishCount, named: "fish_clown/fish_clown_stylized_lod2_anim_ip_loop_swim_1x")
+                var fishes = await self.modelFactory.createModels(ofType: .fish, count: fishCount)
                 _ = fishes.map{ fish in
                     fish.position = .spawnPoint(from: SIMD3(x: 0, y: 0.5, z: 0), radius: 0.5)
                     fishAnchor.addChild(fish)
@@ -128,26 +84,26 @@ struct ImmersiveView: View {
             tapAnchor.transform = Transform(matrix: worldTransform)
         })
         .gesture(
-                    SpatialTapGesture()
+            SpatialTapGesture()
 //                        .targetedToEntity(tapAnchor)
-                        .targetedToAnyEntity()
-                        .onEnded { value in
-                            print(value.entity)
-                            print(value.gestureValue.location3D)
-                            Task {
-                                let worldPosition: SIMD3<Float> = value.convert(value.location3D, from: .local, to: .scene)
-                                await addFood(atLocation: worldPosition)
-                            }
+                .targetedToAnyEntity()
+                .onEnded { value in
+                    print(value.entity)
+                    print(value.gestureValue.location3D)
+                    Task {
+                        let worldPosition: SIMD3<Float> = value.convert(value.location3D, from: .local, to: .scene)
+                        await addFood(atLocation: worldPosition)
+                    }
 //                           playAnimation(entity: foodAnchor)
-                        }
-                )
+                }
+            )
         .task {
             await visionPro.runArkitSession()
         }
     }
     
     func addFood(atLocation location: SIMD3<Float>) async {
-        guard let food = try! await FoodFactory.makeKrill().first else { return }
+        guard let food = await modelFactory.createModels(ofType: .krill, count: 1).first else { return }
         await MainActor.run {
             food.position = location
             foodAnchor.addChild(food, preservingWorldTransform: true)

@@ -13,39 +13,31 @@ struct HungerComponent: RealityKit.Component {
     var currentFoodTarget: Entity?
 }
 
-struct AlgaeEaterComponent: RealityKit.Component { }
-struct PlanktonEaterComponent: RealityKit.Component { }
-
 struct FoodComponent: RealityKit.Component { }
-struct AlgaeComponent: RealityKit.Component { }
-struct PlanktonComponent: RealityKit.Component { }
 
-class EatingSystem: RealityKit.System {
+struct KrillEaterComponent: RealityKit.Component { }
+struct KrillComponent: RealityKit.Component { }
+
+class HungerSystem: RealityKit.System {
     required init(scene: RealityKit.Scene) { }
 
     // Food-seeking behavior runs after flocking finishes, but before the
     // MovementSystem applies acceleration to move the fish.
     static var dependencies: [SystemDependency] = [.after(FlockingSystem.self), .before(MotionSystem.self)]
 
-    static let planktonLoverQuery = EntityQuery(where: .has(HungerComponent.self) && .has(MotionComponent.self) && .has(PlanktonEaterComponent.self))
-    static let algaeLoverQuery = EntityQuery(where: .has(HungerComponent.self) && .has(MotionComponent.self) && .has(AlgaeEaterComponent.self))
+    static let krillEaterQuery = EntityQuery(where: .has(HungerComponent.self) && .has(MotionComponent.self) && .has(KrillEaterComponent.self))
+    static let krillQuery = EntityQuery(where: .has(KrillComponent.self))
 
-    static let planktonQuery = EntityQuery(where: .has(PlanktonComponent.self))
-    static let algaeQuery = EntityQuery(where: .has(AlgaeComponent.self))
 
     func update(context: SceneUpdateContext) {
 
-        let algae = context.scene.performQuery(Self.algaeQuery).map { $0 }
-        let plankton = context.scene.performQuery(Self.planktonQuery).map { $0 }
+        let krill = context.scene.performQuery(Self.krillQuery).map { $0 }
 
         // If there's no food in the scene, don't do anything.
-        guard !(algae.isEmpty && plankton.isEmpty) else { return }
+        guard !(krill.isEmpty) else { return }
 
-        let planktonLovers = context.scene.performQuery(Self.planktonLoverQuery).map { $0 }
-        let algaeLovers = context.scene.performQuery(Self.algaeLoverQuery).map { $0 }
-
-        let eaters = algaeLovers + planktonLovers
-
+        let eaters = context.scene.performQuery(Self.krillEaterQuery).map { $0 }
+        
         for eater in eaters {
             guard var motion = eater.components[MotionComponent.self] else { continue }
             guard var hungerComponent = eater.components[HungerComponent.self] else { continue }
@@ -53,14 +45,7 @@ class EatingSystem: RealityKit.System {
 
             // Pick a random food for the fish follow if it's not already following food.
             if hungerComponent.currentFoodTarget == nil {
-
-                if eater.components.has(PlanktonEaterComponent.self) {
-                    hungerComponent.currentFoodTarget = plankton.randomElement()
-                }
-
-                if hungerComponent.currentFoodTarget == nil, eater.components.has(AlgaeEaterComponent.self) {
-                    hungerComponent.currentFoodTarget = algae.randomElement()
-                }
+                hungerComponent.currentFoodTarget = krill.randomElement()
             }
 
             // If there's no food available, there's nothing to do.

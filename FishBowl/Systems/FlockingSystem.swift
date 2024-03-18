@@ -19,7 +19,7 @@ var maxSteeringForceVector: SIMD3<Float> {
 let separationWeight: Float = 2.8
 let cohesionWeight: Float = 1.0
 let alignmentWeight: Float = 1.0
-let hungerWeight: Float = 1.8
+let hungerWeight: Float = 2
 let fearWeight: Float = 0.0
 let topSpeed: Float = 0.018
 let maxSteeringForce: Float = 5.0

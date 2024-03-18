@@ -15,6 +15,8 @@ struct ContentView: View {
 
     @Environment(\.openImmersiveSpace) var openImmersiveSpace
     @Environment(\.dismissImmersiveSpace) var dismissImmersiveSpace
+    @Environment(\.dismissWindow) private var dismissWindow
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         VStack {
@@ -34,6 +36,7 @@ struct ContentView: View {
                     switch await openImmersiveSpace(id: "ImmersiveSpace") {
                     case .opened:
                         immersiveSpaceIsShown = true
+                        dismissWindow(id: "ContentWindow")
                     case .error, .userCancelled:
                         fallthrough
                     @unknown default:
@@ -42,6 +45,7 @@ struct ContentView: View {
                     }
                 } else if immersiveSpaceIsShown {
                     await dismissImmersiveSpace()
+                    openWindow(id: "ContentWindow")
                     immersiveSpaceIsShown = false
                 }
             }
