@@ -16,20 +16,7 @@ var maxSteeringForceVector: SIMD3<Float> {
     SIMD3<Float>(repeating: 5.0)
 }
 
-let separationWeight: Float = 2.8
-let cohesionWeight: Float = 1.0
-let alignmentWeight: Float = 1.0
-let hungerWeight: Float = 2
-let fearWeight: Float = 0.0
-let topSpeed: Float = 0.018
-let maxSteeringForce: Float = 5.0
-let maxNeighborDistance: Float = 1.0
-let desiredSeparation: Float = 0.2
-let animationScalar: Float = 400.0
-let attractorWeight: Float = 1.0
-
 class FlockingSystem: RealityKit.System {
-    
     
     private static let query = EntityQuery(where: .has(FlockingComponent.self) && .has(MotionComponent.self))// && .has(SettingsComponent.self))
     //private static let leaderQuery = EntityQuery(where: .has(FlockLeader.self))
@@ -52,9 +39,11 @@ class FlockingSystem: RealityKit.System {
             let separation = separate(from: entity, flockers)
             let alignment = align(from: entity, flockers)
             let cohesion = cohere(from: entity, flockers)
+            
+            let hunger = entity.components[HungerComponent.self]?.satiety ?? 1.0
 
             motion.forces.append(MotionComponent.Force(acceleration: separation, multiplier: separationWeight, name: "sep"))
-            motion.forces.append(MotionComponent.Force(acceleration: alignment, multiplier: alignmentWeight, name: "al"))
+            motion.forces.append(MotionComponent.Force(acceleration: alignment, multiplier: alignmentWeight , name: "al"))
             motion.forces.append(MotionComponent.Force(acceleration: cohesion, multiplier: cohesionWeight, name: "coh"))
 
             // If there is a flock leader, follow them for a bit. This prevents the fish from flocking straight in one direction forever.

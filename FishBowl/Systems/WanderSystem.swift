@@ -61,11 +61,9 @@ class WanderSystem: RealityKit.System {
 
             if let attractor = wander.attractor {
                 var steer = normalize(attractor - entity.position)
-//                steer *= settings.topSpeed * wander.wanderlust
                 steer *= topSpeed * wander.wanderlust
                 steer -= motion.velocity
-//                motion.forces.append(MotionComponent.Force(acceleration: steer, multiplier: settings.attractorWeight, name: "wander"))
-                motion.forces.append(MotionComponent.Force(acceleration: steer, multiplier: 1, name: "wander"))
+                motion.forces.append(MotionComponent.Force(acceleration: steer, multiplier: attractorWeight, name: "wander"))
             }
 
             entity.components[MotionComponent.self] = motion

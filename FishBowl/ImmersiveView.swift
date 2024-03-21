@@ -9,7 +9,6 @@ import RealityKit
 import RealityKitContent
 import ARKit
 
-
 @Observable class VisionPro {
     let session = ARKitSession()
     let worldTracking = WorldTrackingProvider()
@@ -25,32 +24,35 @@ import ARKit
     }
 }
 
+extension EventSubscription {
+    func store(in subs: inout [EventSubscription]) {
+        subs.append(self)
+    }
+}
 
 struct ImmersiveView: View {
-    
-    @State var foodAnchor: Entity = AnchorEntity(world: .zero)
+    @State var physicsAnchor: Entity = AnchorEntity(world: .zero)
     @State var tapAnchor: Entity = AnchorEntity(world: .zero)
     @State var worldTransform: simd_float4x4 = .init()
+    @State var subscriptions = [EventSubscription]()
     
     let visionPro = VisionPro()
     let modelFactory = ModelFactory()
+    
+    @State var fishes: [Entity] = []
     
     var body: some View {
         RealityView { content in
             _ = content.subscribe(to: SceneEvents.Update.self) { _ in
                 Task {
                     worldTransform = await visionPro.transformMatrix()
-//                    let x = await visionPro.transformMatrix().columns.0.x
-//                    let y = await visionPro.transformMatrix().columns.1.y
-//                    let z = await visionPro.transformMatrix().columns.2.z
-//                    print(String(format: "%.2f, %.2f, %.2f", x, y, z))
                 }
             }
             // Add the initial RealityKit content
             if let immersiveContentEntity = try? await Entity(named: "Immersive", in: realityKitContentBundle) {
                 content.add(immersiveContentEntity)
                 
-                immersiveContentEntity.addChild(foodAnchor)
+                immersiveContentEntity.addChild(physicsAnchor)
                 immersiveContentEntity.addChild(tapAnchor)
                 
                 let tapPlane = Entity()
@@ -69,14 +71,22 @@ struct ImmersiveView: View {
 
                 // Put skybox here.  See example in World project available at
                 // https://developer.apple.com/
-                var fishAnchor = AnchorEntity(world: .zero)
-                immersiveContentEntity.addChild(fishAnchor)
+//                let fishAnchor = AnchorEntity(world: .zero)
+//                immersiveContentEntity.addChild(fishAnchor)
                 
-                var fishCount = 100
-                var fishes = await self.modelFactory.createModels(ofType: .fish, count: fishCount)
-                _ = fishes.map{ fish in
-                    fish.position = .spawnPoint(from: SIMD3(x: 0, y: 0.5, z: 0), radius: 0.5)
-                    fishAnchor.addChild(fish)
+                fishes = await self.modelFactory.createModels(ofType: .fish, count: fishCount)
+                _ = fishes.enumerated().map{ (idx, fish) in
+                    fish.name = "fish_clone_\(idx)"
+                    fish.position = .spawnPoint(from: SIMD3(x: 0, y: 0, z: 0), radius: 0.5)
+                    fish.position.y = Float.random(in: 0..<0.5)
+                    content.subscribe(to: CollisionEvents.Began.self, on: fish) { event in
+                        self.handleFishCollision(event: event, fish: event.entityA, other: event.entityB)
+                    }.store(in: &subscriptions)
+                    content.subscribe(to: CollisionEvents.Updated.self, on: fish) { event in
+                        self.handleFishCollision(event: event, fish: event.entityA, other: event.entityB)
+                    }.store(in: &subscriptions)
+                    
+                    physicsAnchor.addChild(fish)
                 }
             }
         }
@@ -102,13 +112,62 @@ struct ImmersiveView: View {
         }
     }
     
-    func addFood(atLocation location: SIMD3<Float>) async {
-        guard let food = await modelFactory.createModels(ofType: .krill, count: 1).first else { return }
-        await MainActor.run {
-            food.position = location
-            foodAnchor.addChild(food, preservingWorldTransform: true)
+    private func handleFishCollision(event: Event, fish: Entity, other: Entity) {
+
+        if
+           other.components[KrillComponent.self] != nil,
+           var hungerComponent = fish.components[HungerComponent.self],
+           let target = hungerComponent.currentFoodTarget,
+           other == target {
+            // This fish got to its food target - eat it.
+            other.removeFromParent()
+            fish.components[HungerComponent.self]?.satiety = 1.0
+            // Any other fish that was gunning for this same food is out of luck.
+            fishes = fishes.map{
+                $0.components[HungerComponent.self]?.currentFoodTarget = nil
+                return $0
+            }
         }
-        
+//        else if other is HasSceneUnderstanding,
+//           other.components.has(CollisionComponent.self),
+//           var motion = fish.components[MotionComponent.self] {
+//            
+//            print("\(fish.name)  \(other.name) ")
+
+//            if let collisionUpdated = (event as? CollisionEvents.Began) {
+//
+//                // Clear out all the other forces, just for this frame, and send
+//                // the fish away from this real-world object.
+//                motion.forces.removeAll()
+//                motion.velocity = .zero
+//                var steer = SIMD3<Float>.zero
+//                let results = scene.raycast(origin: fish.position,
+//                                            direction: normalize(fish.position.vector(to: collisionUpdated.position)),
+//                                            length: 1.0,
+//                                            query: .nearest,
+//                                            mask: .sceneUnderstanding,
+//                                            relativeTo: nil)
+//
+//                if let result = results.first {
+//                    steer = normalize(result.normal)
+//
+//                    motion.forces.append(MotionComponent.Force(acceleration: steer, multiplier: settings.bonkWeight, name: "bonk"))
+//                    
+//                    fish.components[MotionComponent.self] = motion
+//                }
+//            }
+//        }
+    }
+    
+    @discardableResult
+    func addFood(atLocation location: SIMD3<Float>) async -> Entity? {
+        guard let food = await modelFactory.createModels(ofType: .krill, count: 1).first else { return nil }
+        Task { @MainActor in
+            food.name = "krill_\(physicsAnchor.children.count)"
+            food.position = location
+            physicsAnchor.addChild(food, preservingWorldTransform: true)
+        }
+        return food
     }
     
     func playAnimation(entity: Entity) {

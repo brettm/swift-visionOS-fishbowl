@@ -11,6 +11,7 @@ import RealityKit
 
 struct HungerComponent: RealityKit.Component {
     var currentFoodTarget: Entity?
+    var satiety: Float = 1.0
 }
 
 struct FoodComponent: RealityKit.Component { }
@@ -47,6 +48,8 @@ class HungerSystem: RealityKit.System {
             if hungerComponent.currentFoodTarget == nil {
                 hungerComponent.currentFoodTarget = krill.randomElement()
             }
+            
+            hungerComponent.satiety -= hungerRate * Float(context.deltaTime * context.deltaTime)
 
             // If there's no food available, there's nothing to do.
             guard let food = hungerComponent.currentFoodTarget else { continue }
@@ -55,7 +58,7 @@ class HungerSystem: RealityKit.System {
             var steer = normalize(food.position - eater.position)
             steer *= topSpeed
             steer -= motion.velocity
-            motion.forces.append(MotionComponent.Force(acceleration: steer, multiplier: hungerWeight, name: "hunger"))
+            motion.forces.append(MotionComponent.Force(acceleration: steer, multiplier: hungerWeight * (1.0 - hungerComponent.satiety), name: "hunger"))
 
             // Store changes to the MotionComponent and HungerComponent
             // back into the entity's components collection.
