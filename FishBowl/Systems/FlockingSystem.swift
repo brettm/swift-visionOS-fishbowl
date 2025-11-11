@@ -13,7 +13,7 @@ import RealityKit
 struct FlockingComponent: Component { }
     
 var maxSteeringForceVector: SIMD3<Float> {
-    SIMD3<Float>(repeating: 5.0)
+    SIMD3<Float>(repeating: 4.0)
 }
 
 class FlockingSystem: RealityKit.System {
@@ -40,7 +40,7 @@ class FlockingSystem: RealityKit.System {
             let alignment = align(from: entity, flockers)
             let cohesion = cohere(from: entity, flockers)
             
-            let hunger = entity.components[HungerComponent.self]?.satiety ?? 1.0
+//            let hunger = entity.components[HungerComponent.self]?.satiety ?? 1.0
 
             motion.forces.append(MotionComponent.Force(acceleration: separation, multiplier: separationWeight, name: "sep"))
             motion.forces.append(MotionComponent.Force(acceleration: alignment, multiplier: alignmentWeight , name: "al"))
@@ -84,7 +84,6 @@ class FlockingSystem: RealityKit.System {
                 }
                 steer += diff
             }
-
             numEntities += 1
         }
 
@@ -110,14 +109,13 @@ class FlockingSystem: RealityKit.System {
         var numNeighbors = 0
         for entity2 in entities where entity2 != entity1 {
             guard let otherMotionComponent = entity2.components[MotionComponent.self] else { continue }
-
             if entity1.isDistanceWithinThreshold(from: entity2, max: maxNeighborDistance) {
                 sum += otherMotionComponent.velocity
                 numNeighbors += 1
             }
         }
 
-        if numNeighbors > 0 && sum.length > 0 {
+        if numNeighbors > 0, sum.length > 0 {
             sum /= Float(numNeighbors)
             sum = normalize(sum)
             sum *= topSpeed

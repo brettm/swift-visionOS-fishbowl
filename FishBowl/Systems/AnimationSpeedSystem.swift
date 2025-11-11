@@ -23,16 +23,15 @@ class AnimationSpeedSystem: RealityKit.System {
         let animators = context.scene.performQuery(Self.query)
 
         for animator in animators {
-            guard let animSpeedComponent = animator.components[AnimationSpeedComponent.self],
+            guard let component = animator.components[AnimationSpeedComponent.self],
                   let motion = animator.components[MotionComponent.self]
                   //let settings = (animator.components[SettingsComponent.self] as? SettingsComponent)?.settings
             else { continue }
 
-            let animationController = animSpeedComponent.animationController
+            let animationController = component.animationController
             // Make the animation play faster when the fish is swimming fast,
             // slower when it's swimming slowly.
-            var animationFramerate = motion.velocity.length
-            animationFramerate *= animationScalar
+            var animationFramerate = max(0.001, motion.velocity.length) * component.scalar
             animationController.speed = animationFramerate
         }
     }

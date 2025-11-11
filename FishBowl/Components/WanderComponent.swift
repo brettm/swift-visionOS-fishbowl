@@ -11,8 +11,7 @@ import RealityKit
 import Foundation
 
 struct WanderComponent: RealityKit.Component {
-    var attractor: SIMD3<Float>?
-
+    var attractor: Entity?
     // Each wanderer wanders at a different speed.
     let wanderlust: Float = Float.random(in: 0.1..<1.0)
 }

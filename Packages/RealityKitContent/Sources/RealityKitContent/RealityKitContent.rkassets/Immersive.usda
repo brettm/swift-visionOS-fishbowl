@@ -5,9 +5,15 @@
     upAxis = "Y"
 )
 
-def Xform "Root"
+def Xform "Root" (
+    prepend apiSchemas = ["MaterialBindingAPI"]
+)
 {
-    reorder nameChildren = ["Sphere", "Sphere_Right", "GridMaterial"]
+    reorder nameChildren = ["Sphere", "Swimming_Shark", "Skydome", "GridMaterial"]
+    rel material:binding = None (
+        bindMaterialAs = "weakerThanDescendants"
+    )
+
     def "GridMaterial" (
         active = true
         references = @Materials/GridMaterial.usda@
@@ -18,9 +24,13 @@ def Xform "Root"
 
         over "GridMaterial"
         {
+            token outputs:mtlx:surface.connect = </Root/GridMaterial/GridMaterial/MaterialXPreviewSurface.outputs:out>
+            prepend token outputs:surface.connect = </Root/GridMaterial/GridMaterial/UsdPreviewSurface.outputs:surface>
             float2 ui:nodegraph:realitykit:subgraphOutputs:size = (181.5, 99)
 
-            over "MaterialXPreviewSurface"
+            over "MaterialXPreviewSurface" (
+                active = false
+            )
             {
                 float2 ui:nodegraph:node:size = (207.5, 307)
             }
@@ -94,6 +104,20 @@ def Xform "Root"
             {
                 float2 ui:nodegraph:node:size = (98, 217)
             }
+
+            def Shader "UsdPreviewSurface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                float inputs:clearcoat = 0.2
+                color3f inputs:diffuseColor = (0.09500283, 0.8684921, 0.63741535) (
+                    colorSpace = "srgb_displayp3"
+                )
+                float inputs:ior = 1.1
+                float inputs:metallic = 0.1
+                float inputs:opacity = 0.1
+                float inputs:opacityThreshold
+                token outputs:surface
+            }
         }
     }
 
@@ -105,11 +129,90 @@ def Xform "Root"
         rel material:binding = </Root/GridMaterial/GridMaterial> (
             bindMaterialAs = "weakerThanDescendants"
         )
-        double radius = 0.1
+        double radius = 1
         quatf xformOp:orient = (1, 0, 0, 0)
-        float3 xformOp:scale = (26.484886, 26.484886, 26.484886)
-        float3 xformOp:translate = (-0.7000135, 1.6612177, -7.2709804)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (0, 0, 0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+    }
+
+    def "Swimming_Shark" (
+        active = true
+        references = @Swimming_Shark.usdz@
+    )
+    {
+        float3 xformOp:scale = (2, 2, 2)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        over "SkinnedMeshes"
+        {
+            quatf xformOp:orient = (1, 0, 0, 0)
+            float3 xformOp:scale = (0.01, 0.01, 0.01)
+            float3 xformOp:translate = (0, 0, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+        }
+    }
+
+    def Sphere "Skydome" (
+        active = true
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        rel material:binding = </Root/Skydome/Meadow_skydomeSG> (
+            bindMaterialAs = "weakerThanDescendants"
+        )
+        double radius = 0.1
+        float3 xformOp:scale = (500, 500, 500)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def Material "Meadow_skydomeSG"
+        {
+            token outputs:mtlx:surface.connect = </Root/Skydome/Meadow_skydomeSG/Meadow_skydome.outputs:out>
+            token outputs:realitykit:vertex
+            string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["outputs:realitykit:vertex"]
+            float2 ui:nodegraph:realitykit:subgraphOutputs:pos = (788.75, 99.5)
+            float2 ui:nodegraph:realitykit:subgraphOutputs:size = (181.5, 99)
+            int ui:nodegraph:realitykit:subgraphOutputs:stackingOrder = 13
+
+            def Shader "Meadow_skydome"
+            {
+                uniform token info:id = "ND_realitykit_unlit_surfaceshader"
+                bool inputs:applyPostProcessToneMap = 0
+                color3f inputs:color.connect = </Root/Skydome/Meadow_skydomeSG/file45.outputs:out>
+                token outputs:out
+                float2 ui:nodegraph:node:pos = (540.75, 99.5)
+                float2 ui:nodegraph:node:size = (194.5, 181)
+                int ui:nodegraph:node:stackingOrder = 11
+                string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["inputs:applyPostProcessToneMap"]
+            }
+
+            def Shader "file45"
+            {
+                uniform token info:id = "ND_image_color3"
+                color3f inputs:default = (0.09495562, 0.2778229, 0.5) (
+                    colorSpace = "srgb_displayp3"
+                )
+                asset inputs:file (
+                    colorSpace = "Input - Texture - sRGB - Display P3"
+                )
+                float2 inputs:texcoord.connect = </Root/Skydome/Meadow_skydomeSG/place2dTexture45.outputs:out>
+                color3f outputs:out
+                float2 ui:nodegraph:node:pos = (309.25, 99.5)
+                float2 ui:nodegraph:node:size = (148.5, 199)
+                int ui:nodegraph:node:stackingOrder = 13
+                string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["inputs:default"]
+            }
+
+            def Shader "place2dTexture45"
+            {
+                uniform token info:id = "ND_UsdPrimvarReader_vector2"
+                string inputs:varname = "st"
+                float2 outputs:out
+                float2 ui:nodegraph:node:pos = (87.5, 99.5)
+                float2 ui:nodegraph:node:size = (175, 127)
+                int ui:nodegraph:node:stackingOrder = 12
+            }
+        }
     }
 }
 

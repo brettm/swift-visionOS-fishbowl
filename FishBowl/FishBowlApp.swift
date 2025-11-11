@@ -15,7 +15,7 @@ enum FishBowlSystems {
         FlockingComponent.registerComponent()
         KrillComponent.registerComponent()
         KrillEaterComponent.registerComponent()
-        HungerComponent.registerComponent()
+        HungerFearComponent.registerComponent()
     }
 
     static private func registerSystems() {
@@ -23,7 +23,8 @@ enum FishBowlSystems {
         WanderSystem.registerSystem()
         AnimationSpeedSystem.registerSystem()
         FlockingSystem.registerSystem()
-        HungerSystem.registerSystem()
+        HungerFearSystem.registerSystem()
+        PredatorSystem.registerSystem()
     }
 
     static public func register() {
@@ -39,7 +40,6 @@ struct FishBowlApp: App {
             ContentView()
                 .task { FishBowlSystems.register() }
         }
-        
         ImmersiveSpace(id: "ImmersiveSpace") {
             ImmersiveView()
         }.immersionStyle(selection: .constant(.full), in: .full)

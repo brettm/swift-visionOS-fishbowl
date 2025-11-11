@@ -29,9 +29,7 @@ extension SIMD3 where Scalar == Float {
 
     var length: Float { return distance(from: .init()) }
 
-    var isNaN: Bool {
-        x.isNaN || y.isNaN || z.isNaN
-    }
+    var isNaN: Bool { x.isNaN || y.isNaN || z.isNaN }
 
     var normalized: SIMD3<Float> {
         return self / length
@@ -46,6 +44,10 @@ extension SIMD3 where Scalar == Float {
     var isVertical: Bool {
         dot(self, Self.up) > 0.9
     }
+    
+    func magnitude() -> Float {
+        return sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2))
+    }
 }
 
 extension SIMD2 where Scalar == Float {
@@ -57,6 +59,5 @@ extension SIMD2 where Scalar == Float {
 }
 
 extension BoundingBox {
-
     var volume: Float { extents.x * extents.y * extents.z }
 }

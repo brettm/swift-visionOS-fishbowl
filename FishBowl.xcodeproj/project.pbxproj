@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8BB124572C8F4E39000474AF /* Fish.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BB124562C8F4E39000474AF /* Fish.swift */; };
+		8BB124592C8FAA3D000474AF /* PredatorSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BB124582C8FAA3D000474AF /* PredatorSystem.swift */; };
 		8BBA2B702B98F94000ECA666 /* RealityKitContent in Frameworks */ = {isa = PBXBuildFile; productRef = 8BBA2B6F2B98F94000ECA666 /* RealityKitContent */; };
 		8BBA2B722B98F94000ECA666 /* FishBowlApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BBA2B712B98F94000ECA666 /* FishBowlApp.swift */; };
 		8BBA2B742B98F94000ECA666 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BBA2B732B98F94000ECA666 /* ContentView.swift */; };
@@ -25,10 +27,11 @@
 		8BF3CCBC2B9A2267000DE9C8 /* AnimationSpeedSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF3CCBB2B9A2267000DE9C8 /* AnimationSpeedSystem.swift */; };
 		8BF3CCBE2B9A227C000DE9C8 /* AnimationSpeedComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF3CCBD2B9A227C000DE9C8 /* AnimationSpeedComponent.swift */; };
 		8BF3CCC02B9B08C7000DE9C8 /* FlockingSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF3CCBF2B9B08C7000DE9C8 /* FlockingSystem.swift */; };
-		8BF3CCC22B9B5B78000DE9C8 /* HungerSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF3CCC12B9B5B78000DE9C8 /* HungerSystem.swift */; };
+		8BF3CCC22B9B5B78000DE9C8 /* HungerFearSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF3CCC12B9B5B78000DE9C8 /* HungerFearSystem.swift */; };
 		8BF3CCC42B9F42CC000DE9C8 /* krill.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 8BF3CCC32B9F42CC000DE9C8 /* krill.usdz */; };
-		8BF3CCC62BA0ACA0000DE9C8 /* ModelFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF3CCC52BA0ACA0000DE9C8 /* ModelFactory.swift */; };
+		8BF3CCC62BA0ACA0000DE9C8 /* Factory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF3CCC52BA0ACA0000DE9C8 /* Factory.swift */; };
 		8BF3CCC82BAA2AB8000DE9C8 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF3CCC72BAA2AB8000DE9C8 /* Constants.swift */; };
+		8BF9D9A92C3C1C0500C4E19C /* OrganismModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF9D9A82C3C1C0500C4E19C /* OrganismModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,6 +45,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		8BB124562C8F4E39000474AF /* Fish.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fish.swift; sourceTree = "<group>"; };
+		8BB124582C8FAA3D000474AF /* PredatorSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PredatorSystem.swift; sourceTree = "<group>"; };
 		8BBA2B6A2B98F94000ECA666 /* FishBowl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FishBowl.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8BBA2B6E2B98F94000ECA666 /* RealityKitContent */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = RealityKitContent; sourceTree = "<group>"; };
 		8BBA2B712B98F94000ECA666 /* FishBowlApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FishBowlApp.swift; sourceTree = "<group>"; };
@@ -63,10 +68,11 @@
 		8BF3CCBB2B9A2267000DE9C8 /* AnimationSpeedSystem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnimationSpeedSystem.swift; sourceTree = "<group>"; };
 		8BF3CCBD2B9A227C000DE9C8 /* AnimationSpeedComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationSpeedComponent.swift; sourceTree = "<group>"; };
 		8BF3CCBF2B9B08C7000DE9C8 /* FlockingSystem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlockingSystem.swift; sourceTree = "<group>"; };
-		8BF3CCC12B9B5B78000DE9C8 /* HungerSystem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HungerSystem.swift; sourceTree = "<group>"; };
+		8BF3CCC12B9B5B78000DE9C8 /* HungerFearSystem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HungerFearSystem.swift; sourceTree = "<group>"; };
 		8BF3CCC32B9F42CC000DE9C8 /* krill.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = krill.usdz; sourceTree = "<group>"; };
-		8BF3CCC52BA0ACA0000DE9C8 /* ModelFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelFactory.swift; sourceTree = "<group>"; };
+		8BF3CCC52BA0ACA0000DE9C8 /* Factory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Factory.swift; sourceTree = "<group>"; };
 		8BF3CCC72BAA2AB8000DE9C8 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		8BF9D9A82C3C1C0500C4E19C /* OrganismModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OrganismModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,6 +94,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8BB124552C8F4E07000474AF /* Organisms */ = {
+			isa = PBXGroup;
+			children = (
+				8BB124562C8F4E39000474AF /* Fish.swift */,
+			);
+			path = Organisms;
+			sourceTree = "<group>";
+		};
 		8BBA2B612B98F94000ECA666 = {
 			isa = PBXGroup;
 			children = (
@@ -110,8 +124,10 @@
 		8BBA2B6C2B98F94000ECA666 /* FishBowl */ = {
 			isa = PBXGroup;
 			children = (
+				8BB124552C8F4E07000474AF /* Organisms */,
 				8BF3CCC72BAA2AB8000DE9C8 /* Constants.swift */,
-				8BF3CCC52BA0ACA0000DE9C8 /* ModelFactory.swift */,
+				8BF3CCC52BA0ACA0000DE9C8 /* Factory.swift */,
+				8BF9D9A72C3C1BF200C4E19C /* Behaviour */,
 				8BF3CCB22B9A0158000DE9C8 /* Systems */,
 				8BF3CCAD2B99F9AE000DE9C8 /* Components */,
 				8BF3CCA82B99E750000DE9C8 /* Resources */,
@@ -178,9 +194,18 @@
 				8BF3CCB72B9A0373000DE9C8 /* WanderSystem.swift */,
 				8BF3CCBB2B9A2267000DE9C8 /* AnimationSpeedSystem.swift */,
 				8BF3CCBF2B9B08C7000DE9C8 /* FlockingSystem.swift */,
-				8BF3CCC12B9B5B78000DE9C8 /* HungerSystem.swift */,
+				8BF3CCC12B9B5B78000DE9C8 /* HungerFearSystem.swift */,
+				8BB124582C8FAA3D000474AF /* PredatorSystem.swift */,
 			);
 			path = Systems;
+			sourceTree = "<group>";
+		};
+		8BF9D9A72C3C1BF200C4E19C /* Behaviour */ = {
+			isa = PBXGroup;
+			children = (
+				8BF9D9A82C3C1C0500C4E19C /* OrganismModel.swift */,
+			);
+			path = Behaviour;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -291,19 +316,22 @@
 			files = (
 				8BF3CCBE2B9A227C000DE9C8 /* AnimationSpeedComponent.swift in Sources */,
 				8BF3CCB12B99FF50000DE9C8 /* MotionComponent.swift in Sources */,
-				8BF3CCC62BA0ACA0000DE9C8 /* ModelFactory.swift in Sources */,
+				8BF3CCC62BA0ACA0000DE9C8 /* Factory.swift in Sources */,
 				8BF3CCBC2B9A2267000DE9C8 /* AnimationSpeedSystem.swift in Sources */,
 				8BF3CCAC2B99EA51000DE9C8 /* VectorMath.swift in Sources */,
 				8BF3CCC82BAA2AB8000DE9C8 /* Constants.swift in Sources */,
-				8BF3CCC22B9B5B78000DE9C8 /* HungerSystem.swift in Sources */,
+				8BF3CCC22B9B5B78000DE9C8 /* HungerFearSystem.swift in Sources */,
 				8BBA2B742B98F94000ECA666 /* ContentView.swift in Sources */,
 				8BF3CCB82B9A0373000DE9C8 /* WanderSystem.swift in Sources */,
 				8BF3CCB62B9A0344000DE9C8 /* WanderComponent.swift in Sources */,
 				8BF3CCBA2B9A0470000DE9C8 /* Entity+Distance.swift in Sources */,
+				8BB124572C8F4E39000474AF /* Fish.swift in Sources */,
 				8BBA2B722B98F94000ECA666 /* FishBowlApp.swift in Sources */,
 				8BF3CCC02B9B08C7000DE9C8 /* FlockingSystem.swift in Sources */,
+				8BB124592C8FAA3D000474AF /* PredatorSystem.swift in Sources */,
 				8BF3CCB42B9A0163000DE9C8 /* MotionSystem.swift in Sources */,
 				8BBA2B762B98F94000ECA666 /* ImmersiveView.swift in Sources */,
+				8BF9D9A92C3C1C0500C4E19C /* OrganismModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

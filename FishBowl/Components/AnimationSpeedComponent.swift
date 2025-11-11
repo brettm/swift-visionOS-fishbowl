@@ -12,4 +12,5 @@ import RealityKit
 
 struct AnimationSpeedComponent: RealityKit.Component {
     var animationController: AnimationPlaybackController
+    var scalar: Float
 }

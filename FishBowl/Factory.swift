@@ -8,6 +8,8 @@
 import Foundation
 import RealityKit
 
+// TODO: Refactor to make extendable
+
 struct EntityFactory {
     var protoType: Entity
     func createClones(count: Int) async throws -> [Entity] {
@@ -29,11 +31,13 @@ struct EntityFactory {
 enum ModelType {
     case fish
     case krill
+    case shark
     
     var modelName: String {
         return switch self {
         case .fish: "fish_clown/fish_clown_stylized_lod2_anim_ip_loop_swim_1x"
         case .krill: "krill"
+        case .shark: "Swimming_Shark"
         }
     }
 }
@@ -59,7 +63,7 @@ class ProtoTypeBuilder {
     }
     
     @discardableResult
-    static private func addComponents(_ entity: Entity, modelType: ModelType) -> Entity {
+    static func addComponents(_ entity: Entity, modelType: ModelType) -> Entity {
         switch modelType {
         case .fish:
             addFishComponents(entity)
@@ -68,8 +72,10 @@ class ProtoTypeBuilder {
         case .krill:
             addKrillComponents(entity)
             addFoodCollisions(entity)
+        case .shark:
+            addSharkComponents(entity)
         }
-        return addAnimationComponents(entity)
+        return entity
     }
 
     @discardableResult
@@ -77,29 +83,30 @@ class ProtoTypeBuilder {
         entity.components[MotionComponent.self] = MotionComponent()
         entity.components[WanderComponent.self] = WanderComponent()
         entity.components[FlockingComponent.self] = FlockingComponent()
-        entity.components[HungerComponent.self] = HungerComponent()
+        entity.components[HungerFearComponent.self] = HungerFearComponent(model: Fish().model)
         entity.components[KrillEaterComponent.self] = KrillEaterComponent()
         return entity
     }
     
-    @discardableResult
-    static private func addKrillComponents(_ entity: Entity) -> Entity {
+    static private func addKrillComponents(_ entity: Entity) {
         entity.components[KrillComponent.self] = KrillComponent()
-        entity.components[FoodComponent.self] = FoodComponent()
-        return entity
+//        entity.components[FoodComponent.self] = FoodComponent()
+    }
+    
+    static private func addSharkComponents(_ entity: Entity) {
+        entity.components[MotionComponent.self] = MotionComponent()
+        entity.components[WanderComponent.self] = WanderComponent()
+        entity.components[PredatorComponent.self] = PredatorComponent()
     }
 
     // This function needs to be called after entities have been cloned
-    @discardableResult
-    static func addAnimationComponents(_ entity: Entity) -> Entity {
+    static func addAnimationComponents(_ entity: Entity, scalar: Float) {
         if let anim = entity.availableAnimations.first {
-            entity.components[AnimationSpeedComponent.self] = AnimationSpeedComponent(animationController: entity.playAnimation(anim.repeat()))
+            entity.components[AnimationSpeedComponent.self] = AnimationSpeedComponent(animationController: entity.playAnimation(anim.repeat()), scalar: scalar)
         }
-        return entity
     }
     
-    @discardableResult
-    static func addFishCollisions(_ entity: Entity, childName: String) -> Entity {
+    static func addFishCollisions(_ entity: Entity, childName: String) {
         // Create collision shapes for all this entity's children, then replace
         // the root entity's CollisionComponent with a collider.
         entity.generateCollisionShapes(recursive: true)
@@ -109,17 +116,14 @@ class ProtoTypeBuilder {
             entity.components[CollisionComponent.self] = collisionComponent
             colliderChild.components[CollisionComponent.self] = nil
         }
-        return entity
     }
     
-    @discardableResult
-    static func addFoodCollisions(_ entity: Entity) -> Entity {
+    static func addFoodCollisions(_ entity: Entity) {
         let spherical = ShapeResource.generateSphere(radius: foodSize)
         var collision = CollisionComponent(shapes: [spherical])
         collision.filter = CollisionFilter(group: .foodGroup, mask: [ .fishGroup ])
         entity.components[CollisionComponent.self] = collision
         entity.generateCollisionShapes(recursive: true)
-        return entity
     }
 }
 
@@ -139,12 +143,18 @@ class ModelFactory {
     public func createModels(ofType type: ModelType, count: Int) async -> [Entity] {
         switch type {
         case .fish:
-            // Unfortunately cloned entities animation components do not play automatically so we need to re-add the animation components after cloning
-            return try! await fishFactory.createClones(count: count).map{ ProtoTypeBuilder.addAnimationComponents( $0 )
+            // Cloned entities animation components do not play automatically so we need to add the animation components after cloning
+            return try! await fishFactory.createClones(count: count).map { ProtoTypeBuilder.addAnimationComponents( $0, scalar: fishAnimationScalar )
+                return $0
             }
         case .krill:
-            return try! await foodFactory.createClones(count: count).map{ ProtoTypeBuilder.addAnimationComponents( $0 )
+            return try! await foodFactory.createClones(count: count).map{ ProtoTypeBuilder.addAnimationComponents( $0, scalar: fishAnimationScalar )
+                return $0
             }
+        case .shark:
+            let shark = await ProtoTypeBuilder.buildPrototype(modelType: .shark)
+            ProtoTypeBuilder.addAnimationComponents( shark, scalar: sharkAnimationScalar )
+            return [shark]
         }
     }
 }

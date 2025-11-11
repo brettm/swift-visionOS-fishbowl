@@ -54,6 +54,7 @@ class MotionSystem: RealityKit.System {
                     from: newTransform.translation,
                     relativeTo: nil
                 )
+                motion.velocity *= pow(Float(friction), dtSquared)
             }
         }
     }
