@@ -7,7 +7,6 @@
 import SwiftUI
 
 enum FishBowlSystems {
-
     static private func registerComponents() {
         MotionComponent.registerComponent()
         WanderComponent.registerComponent()
@@ -16,6 +15,8 @@ enum FishBowlSystems {
         KrillComponent.registerComponent()
         KrillEaterComponent.registerComponent()
         HungerFearComponent.registerComponent()
+        LifespanComponent.registerComponent() // NEW
+        EvolutionStatsComponent.registerComponent() // NEW
     }
 
     static private func registerSystems() {
@@ -25,6 +26,7 @@ enum FishBowlSystems {
         FlockingSystem.registerSystem()
         HungerFearSystem.registerSystem()
         PredatorSystem.registerSystem()
+        EvolutionSystem.registerSystem() // NEW
     }
 
     static public func register() {

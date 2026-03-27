@@ -19,7 +19,6 @@ struct HungerFearComponent: RealityKit.Component {
         self.foodPosition = foodPosition
         self.satiety = satiety
         self.model = model
-        self.model.createNetwork()
     }
 }
 
@@ -30,9 +29,6 @@ struct KrillComponent: RealityKit.Component { }
 class HungerFearSystem: RealityKit.System {
     required init(scene: RealityKit.Scene) { }
 
-    // Food-seeking behavior runs after flocking finishes, but before the
-    // Movement system applies acceleration to move the fish.
-    //
     static var dependencies: [SystemDependency] = [.after(FlockingSystem.self), .before(MotionSystem.self)]
 
     static let krillEaterQuery = EntityQuery(where: .has(HungerFearComponent.self) && .has(MotionComponent.self) && .has(KrillEaterComponent.self))
@@ -48,21 +44,21 @@ class HungerFearSystem: RealityKit.System {
         let predators = context.scene.performQuery(Self.predatorQuery).map { $0 }
         
         for eater in eaters {
-            guard 
+            guard
                 var motion = eater.components[MotionComponent.self],
                 var hungerComponent = eater.components[HungerFearComponent.self]
             else { continue }
-//            guard let settings = (eater.components[SettingsComponent.self])?.settings else { continue }
+
             // Fish are opportunists so always pick the closest food!
-            //
             let distances = krill.indices.map{ (eater.distance(from: krill[$0]), $0) }.filter{ $0.0 < fishVisibility }.sorted(by: <)
             if let distance = distances.first {
                 hungerComponent.foodPosition = krill[distance.1].position
             }
+            
             let hungerChange = hungerRate * Float(context.deltaTime * context.deltaTime)
             hungerComponent.satiety = max(hungerComponent.satiety - hungerChange, 0)
+            
             // If there's no food available, there's nothing to do.
-            //
             var nTargetDirection: SIMD3<Float> = .zero
             var targetDistance: Float = -1.0
             if let foodPosition = hungerComponent.foodPosition {
@@ -72,8 +68,6 @@ class HungerFearSystem: RealityKit.System {
             }
             
             // Steer the fish toward the food using our learned model
-            //
-            
             var nFearDirection: SIMD3<Float> = .zero
             var fearDistance: Float = -1.0
             if let fearPosition = predators.first?.position {
@@ -92,7 +86,7 @@ class HungerFearSystem: RealityKit.System {
             steer *= prediction[3]
             steer *= topSpeed
             steer -= motion.velocity
-//            let multiplier = hungerWeight * (1.0 - hungerComponent.satiety)
+            
             let multiplier: Float = 10.0
             motion.forces.append(
                 MotionComponent.Force(
@@ -100,8 +94,8 @@ class HungerFearSystem: RealityKit.System {
                     multiplier: multiplier,
                     name: "hunger")
             )
+            
             // Store changes to the MotionComponent and HungerComponent
-            // back into the entity's components collection.
             eater.components[MotionComponent.self] = motion
             eater.components[HungerFearComponent.self] = hungerComponent
         }

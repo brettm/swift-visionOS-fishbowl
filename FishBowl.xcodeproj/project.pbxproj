@@ -31,6 +31,9 @@
 		8BF3CCC42B9F42CC000DE9C8 /* krill.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 8BF3CCC32B9F42CC000DE9C8 /* krill.usdz */; };
 		8BF3CCC62BA0ACA0000DE9C8 /* Factory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF3CCC52BA0ACA0000DE9C8 /* Factory.swift */; };
 		8BF3CCC82BAA2AB8000DE9C8 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF3CCC72BAA2AB8000DE9C8 /* Constants.swift */; };
+		8BF9A58F2EC498D8008DD77E /* EvolutionComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF9A58E2EC498D8008DD77E /* EvolutionComponent.swift */; };
+		8BF9A5912EC4991C008DD77E /* EvolutionSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF9A5902EC4991C008DD77E /* EvolutionSystem.swift */; };
+		8BF9A5942EC4AF39008DD77E /* FishManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF9A5932EC4AF39008DD77E /* FishManager.swift */; };
 		8BF9D9A92C3C1C0500C4E19C /* OrganismModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF9D9A82C3C1C0500C4E19C /* OrganismModel.swift */; };
 /* End PBXBuildFile section */
 
@@ -72,6 +75,9 @@
 		8BF3CCC32B9F42CC000DE9C8 /* krill.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = krill.usdz; sourceTree = "<group>"; };
 		8BF3CCC52BA0ACA0000DE9C8 /* Factory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Factory.swift; sourceTree = "<group>"; };
 		8BF3CCC72BAA2AB8000DE9C8 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		8BF9A58E2EC498D8008DD77E /* EvolutionComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EvolutionComponent.swift; sourceTree = "<group>"; };
+		8BF9A5902EC4991C008DD77E /* EvolutionSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EvolutionSystem.swift; sourceTree = "<group>"; };
+		8BF9A5932EC4AF39008DD77E /* FishManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FishManager.swift; sourceTree = "<group>"; };
 		8BF9D9A82C3C1C0500C4E19C /* OrganismModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OrganismModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -124,6 +130,7 @@
 		8BBA2B6C2B98F94000ECA666 /* FishBowl */ = {
 			isa = PBXGroup;
 			children = (
+				8BF9A5922EC4AF29008DD77E /* Managers */,
 				8BB124552C8F4E07000474AF /* Organisms */,
 				8BF3CCC72BAA2AB8000DE9C8 /* Constants.swift */,
 				8BF3CCC52BA0ACA0000DE9C8 /* Factory.swift */,
@@ -183,6 +190,7 @@
 				8BF3CCB02B99FF50000DE9C8 /* MotionComponent.swift */,
 				8BF3CCB52B9A0344000DE9C8 /* WanderComponent.swift */,
 				8BF3CCBD2B9A227C000DE9C8 /* AnimationSpeedComponent.swift */,
+				8BF9A58E2EC498D8008DD77E /* EvolutionComponent.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -196,8 +204,17 @@
 				8BF3CCBF2B9B08C7000DE9C8 /* FlockingSystem.swift */,
 				8BF3CCC12B9B5B78000DE9C8 /* HungerFearSystem.swift */,
 				8BB124582C8FAA3D000474AF /* PredatorSystem.swift */,
+				8BF9A5902EC4991C008DD77E /* EvolutionSystem.swift */,
 			);
 			path = Systems;
+			sourceTree = "<group>";
+		};
+		8BF9A5922EC4AF29008DD77E /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				8BF9A5932EC4AF39008DD77E /* FishManager.swift */,
+			);
+			path = Managers;
 			sourceTree = "<group>";
 		};
 		8BF9D9A72C3C1BF200C4E19C /* Behaviour */ = {
@@ -316,11 +333,14 @@
 			files = (
 				8BF3CCBE2B9A227C000DE9C8 /* AnimationSpeedComponent.swift in Sources */,
 				8BF3CCB12B99FF50000DE9C8 /* MotionComponent.swift in Sources */,
+				8BF9A5912EC4991C008DD77E /* EvolutionSystem.swift in Sources */,
 				8BF3CCC62BA0ACA0000DE9C8 /* Factory.swift in Sources */,
+				8BF9A58F2EC498D8008DD77E /* EvolutionComponent.swift in Sources */,
 				8BF3CCBC2B9A2267000DE9C8 /* AnimationSpeedSystem.swift in Sources */,
 				8BF3CCAC2B99EA51000DE9C8 /* VectorMath.swift in Sources */,
 				8BF3CCC82BAA2AB8000DE9C8 /* Constants.swift in Sources */,
 				8BF3CCC22B9B5B78000DE9C8 /* HungerFearSystem.swift in Sources */,
+				8BF9A5942EC4AF39008DD77E /* FishManager.swift in Sources */,
 				8BBA2B742B98F94000ECA666 /* ContentView.swift in Sources */,
 				8BF3CCB82B9A0373000DE9C8 /* WanderSystem.swift in Sources */,
 				8BF3CCB62B9A0344000DE9C8 /* WanderComponent.swift in Sources */,

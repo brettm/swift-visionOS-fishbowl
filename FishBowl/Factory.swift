@@ -80,6 +80,7 @@ class ProtoTypeBuilder {
 
     @discardableResult
     static private func addFishComponents(_ entity: Entity) -> Entity {
+        entity.components[LifespanComponent.self] = LifespanComponent()
         entity.components[MotionComponent.self] = MotionComponent()
         entity.components[WanderComponent.self] = WanderComponent()
         entity.components[FlockingComponent.self] = FlockingComponent()
