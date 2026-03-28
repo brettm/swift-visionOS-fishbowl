@@ -50,25 +50,25 @@ struct ImmersiveView: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             RealityView { content in
-                _ = content.subscribe(to: SceneEvents.Update.self) { _ in
+                _ = content.subscribe(to: SceneEvents.Update.self) { event in
                     Task { worldTransform = await visionPro.transformMatrix() }
-                }
-                
-                // Pass stats to systems
-                if let evoSystem = content.scene.system(for: EvolutionSystem.self) {
-                    evoSystem.setSimulationStats(stats)
-                }
-                if let motionSystem = content.scene.system(for: MotionSystem.self) {
-                    motionSystem.setSimulationStats(stats)
-                }
-                if let wanderSystem = content.scene.system(for: WanderSystem.self) {
-                    wanderSystem.setSimulationStats(stats)
-                }
-                if let hungerSystem = content.scene.system(for: HungerFearSystem.self) {
-                    hungerSystem.setSimulationStats(stats)
-                }
-                if let animSystem = content.scene.system(for: AnimationSpeedSystem.self) {
-                    animSystem.setSimulationStats(stats)
+                    
+                    // Pass stats to systems
+                    if let evoSystem = event.scene.system(for: EvolutionSystem.self) {
+                        evoSystem.setSimulationStats(stats)
+                    }
+                    if let motionSystem = event.scene.system(for: MotionSystem.self) {
+                        motionSystem.setSimulationStats(stats)
+                    }
+                    if let wanderSystem = event.scene.system(for: WanderSystem.self) {
+                        wanderSystem.setSimulationStats(stats)
+                    }
+                    if let hungerSystem = event.scene.system(for: HungerFearSystem.self) {
+                        hungerSystem.setSimulationStats(stats)
+                    }
+                    if let animSystem = event.scene.system(for: AnimationSpeedSystem.self) {
+                        animSystem.setSimulationStats(stats)
+                    }
                 }
                 
                 // Add the initial RealityKit content
