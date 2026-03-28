@@ -2,14 +2,37 @@ import RealityKit
 import Foundation
 
 class EvolutionSystem: System {
+    
+    // MARK: - Evolution Parameters
+    private enum Params {
+        // Fitness Function
+        static let tickAliveReward: Float = 0.1
+        static let eatingReward: Float = 10.0
+        static let evasionReward: Float = 5.0
+        static let starvationPenalty: Float = 20.0
+        static let oldAgePenalty: Float = 5.0
+        static let childrenMultiplier: Float = 1.5
+        
+        // Population & Generation
+        static let populationCollapseThreshold: Int = 5
+        static let emergencyRepopulationCount: Int = 10
+        static let generationDeathThreshold: Float = 0.7
+        static let tournamentSize: Int = 3
+        
+        // Lifespan & Death
+        static let maxLifespan: TimeInterval = 100.0 // seconds
+        static let randomDeathChance: Float = 0.0005
+        
+        // Mutation
+        static let baseMutationRate: Float = 0.15
+        static let mutationRange: ClosedRange<Float> = -0.3...0.3
+        static let weightClampRange: ClosedRange<Float> = -2.0...2.0
+    }
+    
     private static let fishQuery = EntityQuery(where: .has(LifespanComponent.self) && .has(HungerFearComponent.self))
     private static let predatorQuery = EntityQuery(where: .has(PredatorComponent.self))
         
     static var dependencies: [SystemDependency] { [.after(HungerFearSystem.self)] }
-    
-    // Evolution parameters
-    private let maxLifespan: TimeInterval = 100.0 // seconds
-    private let baseMutationRate: Float = 0.15
     
     // Track stats in the system itself - no entity needed
     private var evolutionStats = EvolutionStatsComponent()
@@ -26,12 +49,12 @@ class EvolutionSystem: System {
         let predators = context.scene.performQuery(Self.predatorQuery).map { $0 }
         
         // 1. Emergency Repopulation Guard
-        if fish.count > 0 && fish.count < 5 {
+        if fish.count > 0 && fish.count < Params.populationCollapseThreshold {
             triggerEmergencyRepopulation(in: context.scene, currentFish: fish.first!)
         }
         
         // 2. Generation Advancement Trigger
-        let deathThreshold = Int(Float(fishCount) * 0.7)
+        let deathThreshold = Int(Float(fishCount) * Params.generationDeathThreshold)
         if evolutionStats.generationDeathCount >= deathThreshold {
             advanceGeneration(survivors: fish, scene: context.scene)
             return // Skip normal update for this frame while we reset
@@ -43,19 +66,19 @@ class EvolutionSystem: System {
             
             lifespan.age += context.deltaTime
             
-            // +0.1 per tick alive
-            lifespan.fitness += 0.1
+            // Reward per tick alive
+            lifespan.fitness += Params.tickAliveReward
             
-            // +10.0 for successfully eating food (detect satiety increase)
+            // Reward for successfully eating food (detect satiety increase)
             if hunger.satiety > lifespan.previousSatiety {
-                lifespan.fitness += 10.0
+                lifespan.fitness += Params.eatingReward
             }
             lifespan.previousSatiety = hunger.satiety
             
-            // +5.0 per tick spent within predator detection range while surviving
+            // Reward per tick spent within predator detection range while surviving
             for predator in predators {
                 if entity.distance(from: predator) < sharkVisibility {
-                    lifespan.fitness += 5.0
+                    lifespan.fitness += Params.evasionReward
                     break
                 }
             }
@@ -79,13 +102,13 @@ class EvolutionSystem: System {
                 
                 // Apply death penalties
                 if cause == .starvation {
-                    lifespan.fitness -= 20.0
+                    lifespan.fitness -= Params.starvationPenalty
                 } else if cause == .oldAge {
-                    lifespan.fitness -= 5.0
+                    lifespan.fitness -= Params.oldAgePenalty
                 }
                 
                 // Apply children multiplier
-                lifespan.fitness += Float(lifespan.childrenCount) * 1.5
+                lifespan.fitness += Float(lifespan.childrenCount) * Params.childrenMultiplier
                 
                 entity.components[LifespanComponent.self] = lifespan
                 evolutionStats.generationDeathCount += 1
@@ -107,14 +130,14 @@ class EvolutionSystem: System {
     
     private func shouldDie(lifespan: LifespanComponent, hunger: HungerFearComponent) -> Bool {
         if hunger.satiety <= 0 { return true }
-        if lifespan.age > maxLifespan { return true }
-        if Float.random(in: 0...1) < 0.0005 { return true }
+        if lifespan.age > Params.maxLifespan { return true }
+        if Float.random(in: 0...1) < Params.randomDeathChance { return true }
         return false
     }
     
     private func determineCauseOfDeath(lifespan: LifespanComponent, hunger: HungerFearComponent) -> DeathCause {
         if hunger.satiety <= 0 { return .starvation }
-        if lifespan.age > maxLifespan { return .oldAge }
+        if lifespan.age > Params.maxLifespan { return .oldAge }
         return .accident
     }
     
@@ -122,7 +145,7 @@ class EvolutionSystem: System {
         guard let physicsAnchor = findPhysicsAnchor(in: currentFish) else { return }
         
         Task {
-            let newFishes = await ModelFactory().createModels(ofType: .fish, count: 10)
+            let newFishes = await ModelFactory().createModels(ofType: .fish, count: Params.emergencyRepopulationCount)
             
             await MainActor.run {
                 for newFish in newFishes {
@@ -148,7 +171,7 @@ class EvolutionSystem: System {
                                     hiddenToOutputBias: hidOutBias
                                 )
                                 
-                                newHunger.model.weights = self.mutateWeights(bestWeights, mutationRate: self.baseMutationRate, fitness: self.evolutionStats.bestEverFitness)
+                                newHunger.model.weights = self.mutateWeights(bestWeights, mutationRate: Params.baseMutationRate, fitness: self.evolutionStats.bestEverFitness)
                             }
                         }
                         
@@ -179,7 +202,7 @@ class EvolutionSystem: System {
         if !survivors.isEmpty {
             for _ in 0..<fishCount {
                 var tournament: [Entity] = []
-                for _ in 0..<min(3, survivors.count) {
+                for _ in 0..<min(Params.tournamentSize, survivors.count) {
                     if let randomFish = survivors.randomElement() {
                         tournament.append(randomFish)
                     }
@@ -217,7 +240,7 @@ class EvolutionSystem: System {
                             let parent = selectedParents[index]
                             if let parentHunger = parent.components[HungerFearComponent.self],
                                let parentLifespan = parent.components[LifespanComponent.self] {
-                                newHunger.model.weights = self.mutateWeights(parentHunger.model.weights, mutationRate: self.baseMutationRate, fitness: parentLifespan.fitness)
+                                newHunger.model.weights = self.mutateWeights(parentHunger.model.weights, mutationRate: Params.baseMutationRate, fitness: parentLifespan.fitness)
                             }
                         }
                         
@@ -239,15 +262,15 @@ class EvolutionSystem: System {
         
         for i in 0..<newWeights.inputToHiddenWeights.count {
             if Float.random(in: 0...1) < effectiveMutationRate {
-                newWeights.inputToHiddenWeights[i] += Float.random(in: -0.3...0.3)
-                newWeights.inputToHiddenWeights[i] = max(-2.0, min(2.0, newWeights.inputToHiddenWeights[i]))
+                newWeights.inputToHiddenWeights[i] += Float.random(in: Params.mutationRange)
+                newWeights.inputToHiddenWeights[i] = max(Params.weightClampRange.lowerBound, min(Params.weightClampRange.upperBound, newWeights.inputToHiddenWeights[i]))
             }
         }
         
         for i in 0..<newWeights.hiddenToOutputWeights.count {
             if Float.random(in: 0...1) < effectiveMutationRate {
-                newWeights.hiddenToOutputWeights[i] += Float.random(in: -0.3...0.3)
-                newWeights.hiddenToOutputWeights[i] = max(-2.0, min(2.0, newWeights.hiddenToOutputWeights[i]))
+                newWeights.hiddenToOutputWeights[i] += Float.random(in: Params.mutationRange)
+                newWeights.hiddenToOutputWeights[i] = max(Params.weightClampRange.lowerBound, min(Params.weightClampRange.upperBound, newWeights.hiddenToOutputWeights[i]))
             }
         }
         
