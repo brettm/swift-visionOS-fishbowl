@@ -54,19 +54,19 @@ struct ImmersiveView: View {
                     Task { worldTransform = await visionPro.transformMatrix() }
                     
                     // Pass stats to systems
-                    if let evoSystem = RealityViewContent.scene.first(where: { $0.type == EvolutionSystem.self }) {
+                    if let evoSystem = content.scene.systems.first(where: { $0.type == EvolutionSystem.self }) {
                         evoSystem.setSimulationStats(stats)
                     }
-                    if let motionSystem = content.systems.first(where: { $0.type == MotionSystem.self }) {
+                    if let motionSystem = content.scene.systems.first(where: { $0.type == MotionSystem.self }) {
                         motionSystem.setSimulationStats(stats)
                     }
-                    if let wanderSystem = content.systems.first(where: { $0.type == WanderSystem.self }) {
+                    if let wanderSystem = content.scene.systems.first(where: { $0.type == WanderSystem.self }) {
                         wanderSystem.setSimulationStats(stats)
                     }
-                    if let hungerSystem = content.systems.first(where: { $0.type == HungerFearSystem.self }) {
+                    if let hungerSystem = content.scene.systems.first(where: { $0.type == HungerFearSystem.self }) {
                         hungerSystem.setSimulationStats(stats)
                     }
-                    if let animSystem = content.systems.first(where: { $0.type == AnimationSpeedSystem.self }) {
+                    if let animSystem = content.scene.systems.first(where: { $0.type == AnimationSpeedSystem.self }) {
                         animSystem.setSimulationStats(stats)
                     }
                 }
