@@ -54,7 +54,7 @@ struct ImmersiveView: View {
                     Task { worldTransform = await visionPro.transformMatrix() }
                     
                     // Pass stats to systems
-                    if let evoSystem = content.systems.first(where: { $0.type == EvolutionSystem.self }) {
+                    if let evoSystem = RealityViewContent.scene.first(where: { $0.type == EvolutionSystem.self }) {
                         evoSystem.setSimulationStats(stats)
                     }
                     if let motionSystem = content.systems.first(where: { $0.type == MotionSystem.self }) {
