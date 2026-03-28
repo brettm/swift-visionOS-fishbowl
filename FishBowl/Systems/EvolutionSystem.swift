@@ -211,6 +211,12 @@ class EvolutionSystem: System {
         }
     }
     
+    // A simple struct to hold parent data so we don't capture non-Sendable Entity objects in the Task
+    private struct ParentData: Sendable {
+        let weights: ModelWeights
+        let fitness: Float
+    }
+    
     private func advanceGeneration(survivors: [Entity], scene: Scene) {
         guard let firstFish = survivors.first, let physicsAnchor = findPhysicsAnchor(in: firstFish) else { return }
         
@@ -247,14 +253,19 @@ class EvolutionSystem: System {
             }
         }
         
+        // Extract the data we need into a Sendable struct to avoid capturing Entity in the Task
+        let parentData: [ParentData] = parents.compactMap { parent in
+            guard let hunger = parent.components[HungerFearComponent.self],
+                  let lifespan = parent.components[LifespanComponent.self] else { return nil }
+            return ParentData(weights: hunger.model.weights, fitness: lifespan.fitness)
+        }
+        
         // Remove old generation
         for fish in survivors {
             Task { @MainActor in
                 fish.removeFromParent()
             }
         }
-        
-        let selectedParents = parents
         
         // Spawn new generation
         Task {
@@ -265,12 +276,9 @@ class EvolutionSystem: System {
                     if var newHunger = newFish.components[HungerFearComponent.self],
                        var newLifespan = newFish.components[LifespanComponent.self] {
                         
-                        if index < selectedParents.count {
-                            let parent = selectedParents[index]
-                            if let parentHunger = parent.components[HungerFearComponent.self],
-                               let parentLifespan = parent.components[LifespanComponent.self] {
-                                newHunger.model.weights = self.mutateWeights(parentHunger.model.weights, mutationRate: Params.baseMutationRate, fitness: parentLifespan.fitness)
-                            }
+                        if index < parentData.count {
+                            let pData = parentData[index]
+                            newHunger.model.weights = self.mutateWeights(pData.weights, mutationRate: Params.baseMutationRate, fitness: pData.fitness)
                         }
                         
                         newLifespan.generation = self.evolutionStats.totalGenerations
