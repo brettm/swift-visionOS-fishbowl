@@ -37,6 +37,7 @@ class EvolutionSystem: System {
     // Track stats in the system itself - no entity needed
     private var evolutionStats = EvolutionStatsComponent()
     private weak var fishManager: FishManager?
+    private var simulationStats: SimulationStats?
     
     required init(scene: Scene) { }
     
@@ -44,7 +45,14 @@ class EvolutionSystem: System {
         self.fishManager = manager
     }
     
+    func setSimulationStats(_ stats: SimulationStats) {
+        self.simulationStats = stats
+    }
+    
     func update(context: SceneUpdateContext) {
+        let speed = simulationStats?.simulationSpeed ?? 1.0
+        let dt = context.deltaTime * Double(speed)
+        
         let fish = context.scene.performQuery(Self.fishQuery).map { $0 }
         let predators = context.scene.performQuery(Self.predatorQuery).map { $0 }
         
@@ -57,6 +65,7 @@ class EvolutionSystem: System {
         let deathThreshold = Int(Float(fishCount) * Params.generationDeathThreshold)
         if evolutionStats.generationDeathCount >= deathThreshold {
             advanceGeneration(survivors: fish, scene: context.scene)
+            updateSharedStats(population: fish.count)
             return // Skip normal update for this frame while we reset
         }
         
@@ -64,10 +73,10 @@ class EvolutionSystem: System {
             guard var lifespan = entity.components[LifespanComponent.self],
                   let hunger = entity.components[HungerFearComponent.self] else { continue }
             
-            lifespan.age += context.deltaTime
+            lifespan.age += dt
             
             // Reward per tick alive
-            lifespan.fitness += Params.tickAliveReward
+            lifespan.fitness += Params.tickAliveReward * Float(speed)
             
             // Reward for successfully eating food (detect satiety increase)
             if hunger.satiety > lifespan.previousSatiety {
@@ -78,7 +87,7 @@ class EvolutionSystem: System {
             // Reward per tick spent within predator detection range while surviving
             for predator in predators {
                 if entity.distance(from: predator) < sharkVisibility {
-                    lifespan.fitness += Params.evasionReward
+                    lifespan.fitness += Params.evasionReward * Float(speed)
                     break
                 }
             }
@@ -96,15 +105,19 @@ class EvolutionSystem: System {
             }
         
             // Check for death conditions
-            if shouldDie(lifespan: lifespan, hunger: hunger) {
+            if shouldDie(lifespan: lifespan, hunger: hunger, speed: speed) {
                 let cause = determineCauseOfDeath(lifespan: lifespan, hunger: hunger)
                 lifespan.causeOfDeath = cause
                 
                 // Apply death penalties
                 if cause == .starvation {
                     lifespan.fitness -= Params.starvationPenalty
+                    simulationStats?.starvationDeaths += 1
                 } else if cause == .oldAge {
                     lifespan.fitness -= Params.oldAgePenalty
+                    simulationStats?.oldAgeDeaths += 1
+                } else {
+                    simulationStats?.accidentDeaths += 1
                 }
                 
                 // Apply children multiplier
@@ -126,12 +139,23 @@ class EvolutionSystem: System {
         evolutionStats.populationHistory.append(fish.count)
         evolutionStats.totalGenerations = max(evolutionStats.totalGenerations,
                                             fish.compactMap { $0.components[LifespanComponent.self]?.generation }.max() ?? 0)
+                                            
+        updateSharedStats(population: fish.count)
     }
     
-    private func shouldDie(lifespan: LifespanComponent, hunger: HungerFearComponent) -> Bool {
+    private func updateSharedStats(population: Int) {
+        guard let stats = simulationStats else { return }
+        stats.currentGeneration = evolutionStats.totalGenerations
+        stats.populationCount = population
+        stats.averageFitness = evolutionStats.averageFitness
+        stats.bestEverFitness = evolutionStats.bestEverFitness
+        stats.deathsThisGeneration = evolutionStats.generationDeathCount
+    }
+    
+    private func shouldDie(lifespan: LifespanComponent, hunger: HungerFearComponent, speed: Float) -> Bool {
         if hunger.satiety <= 0 { return true }
         if lifespan.age > Params.maxLifespan { return true }
-        if Float.random(in: 0...1) < Params.randomDeathChance { return true }
+        if Float.random(in: 0...1) < (Params.randomDeathChance * speed) { return true }
         return false
     }
     
@@ -196,6 +220,11 @@ class EvolutionSystem: System {
         
         evolutionStats.totalGenerations += 1
         evolutionStats.generationDeathCount = 0
+        
+        // Reset death counters for the new generation
+        simulationStats?.starvationDeaths = 0
+        simulationStats?.oldAgeDeaths = 0
+        simulationStats?.accidentDeaths = 0
         
         // Tournament selection
         var parents: [Entity] = []

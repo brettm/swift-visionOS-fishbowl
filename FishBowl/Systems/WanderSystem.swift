@@ -16,10 +16,16 @@ class WanderSystem: RealityKit.System {
     // This system should always run before the Motion system, which manages
     // acceleration, which this system modifies.
     static var dependencies: [SystemDependency] { [.before(MotionSystem.self)] }
+    private var simulationStats: SimulationStats?
 
     required init(scene: Scene) { }
+    
+    func setSimulationStats(_ stats: SimulationStats) {
+        self.simulationStats = stats
+    }
 
     func update(context: SceneUpdateContext) {
+        let speed = simulationStats?.simulationSpeed ?? 1.0
         let wanderers = context.scene.performQuery(Self.query)
 
         for entity in wanderers {
@@ -28,35 +34,10 @@ class WanderSystem: RealityKit.System {
                 //let settings = (entity.components[SettingsComponent.self] as? SettingsComponent)?.settings 
             else { continue }
 
-//            var distanceFromAttractor = Float(0)
-//            if let attractor = wander.attractor {
-//                distanceFromAttractor = entity.distance(from: attractor)
-//            }
-//            // This method has reached its attractor; pick a new one.
-//            if distanceFromAttractor < 0.01 {
-////                var newAttractor = SIMD3<Float>.spawnPoint(from: Settings.fishOrigin, radius: Settings.wanderRadius)
-//                var newAttractor = SIMD3<Float>.spawnPoint(from: .zero, radius: 0.5)
-//                // Keep the wanderer roughly level with where it currently is
-//                // to avoid going up or down too steeply.
-//                newAttractor.y = entity.position.y + Float.random(in: 0..<0.5)
-//
-//                let obstacles = context.scene.raycast(from: entity.position,
-//                                                      to: newAttractor,
-//                                                      query: .nearest,
-//                                                      mask: .sceneUnderstanding,
-//                                                      relativeTo: nil)
-//
-//                // Don't pick a point in the wall.
-//                if let nearest = obstacles.first {
-//                    newAttractor = nearest.position
-//                }
-//                wander.attractor = newAttractor
-//            }
-
             if let attractor = wander.attractor {
                 var steer = normalize(attractor.position - entity.position)
                 if !steer.isNaN {
-                    steer *= topSpeed * wander.wanderlust
+                    steer *= topSpeed * wander.wanderlust * speed
                     steer -= motion.velocity
                     motion.forces.append(MotionComponent.Force(acceleration: steer, multiplier: attractorWeight, name: "wander"))
                 }

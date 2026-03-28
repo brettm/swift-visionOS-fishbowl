@@ -14,12 +14,17 @@ import RealityKit
 class MotionSystem: RealityKit.System {
 
     private static let query = EntityQuery(where: .has(MotionComponent.self)) //&& .has(SettingsComponent.self))
+    private var simulationStats: SimulationStats?
 
     required init(scene: RealityKit.Scene) { }
+    
+    func setSimulationStats(_ stats: SimulationStats) {
+        self.simulationStats = stats
+    }
 
     func update(context: SceneUpdateContext) {
-
-        let deltaTime = Float(context.deltaTime)
+        let speed = simulationStats?.simulationSpeed ?? 1.0
+        let deltaTime = Float(context.deltaTime) * speed
         let dtSquared = deltaTime * deltaTime
 
         context.scene.performQuery(Self.query).forEach { entity in

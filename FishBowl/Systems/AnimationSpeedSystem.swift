@@ -13,13 +13,18 @@ import RealityKit
 class AnimationSpeedSystem: RealityKit.System {
 
     private static let query = EntityQuery(where: .has(AnimationSpeedComponent.self) && .has(MotionComponent.self))
+    private var simulationStats: SimulationStats?
 
     required init(scene: Scene) { }
 
     static var dependencies: [SystemDependency] { [.after(MotionSystem.self)] }
+    
+    func setSimulationStats(_ stats: SimulationStats) {
+        self.simulationStats = stats
+    }
 
     func update(context: SceneUpdateContext) {
-
+        let speed = simulationStats?.simulationSpeed ?? 1.0
         let animators = context.scene.performQuery(Self.query)
 
         for animator in animators {
@@ -31,7 +36,7 @@ class AnimationSpeedSystem: RealityKit.System {
             let animationController = component.animationController
             // Make the animation play faster when the fish is swimming fast,
             // slower when it's swimming slowly.
-            let animationFramerate = max(0.001, motion.velocity.length) * component.scalar
+            let animationFramerate = max(0.001, motion.velocity.length) * component.scalar * speed
             animationController.speed = animationFramerate
         }
     }

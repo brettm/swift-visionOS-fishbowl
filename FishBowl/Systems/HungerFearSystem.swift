@@ -27,6 +27,8 @@ struct KrillEaterComponent: RealityKit.Component { }
 struct KrillComponent: RealityKit.Component { }
 
 class HungerFearSystem: RealityKit.System {
+    private var simulationStats: SimulationStats?
+    
     required init(scene: RealityKit.Scene) { }
 
     static var dependencies: [SystemDependency] = [.after(FlockingSystem.self), .before(MotionSystem.self)]
@@ -35,7 +37,13 @@ class HungerFearSystem: RealityKit.System {
     static let krillQuery = EntityQuery(where: .has(KrillComponent.self))
     static let predatorQuery = EntityQuery(where: .has(PredatorComponent.self) && .has(MotionComponent.self))
 
+    func setSimulationStats(_ stats: SimulationStats) {
+        self.simulationStats = stats
+    }
+
     func update(context: SceneUpdateContext) {
+        let speed = simulationStats?.simulationSpeed ?? 1.0
+        let dt = Float(context.deltaTime) * speed
 
         let krill = context.scene.performQuery(Self.krillQuery).map { $0 }
         guard !(krill.isEmpty) else { return }
@@ -55,7 +63,7 @@ class HungerFearSystem: RealityKit.System {
                 hungerComponent.foodPosition = krill[distance.1].position
             }
             
-            let hungerChange = hungerRate * Float(context.deltaTime * context.deltaTime)
+            let hungerChange = hungerRate * (dt * dt)
             hungerComponent.satiety = max(hungerComponent.satiety - hungerChange, 0)
             
             // If there's no food available, there's nothing to do.
@@ -84,7 +92,7 @@ class HungerFearSystem: RealityKit.System {
             // Update the motion forces with the model prediction
             var steer = SIMD3(prediction[0...2])
             steer *= prediction[3]
-            steer *= topSpeed
+            steer *= topSpeed * speed
             steer -= motion.velocity
             
             let multiplier: Float = 10.0

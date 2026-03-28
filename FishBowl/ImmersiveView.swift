@@ -43,124 +43,119 @@ struct ImmersiveView: View {
     @State var sharks: [Entity] = []
     @State var sphere: Entity?
     
+    @State var stats = SimulationStats()
+    
     let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
     
     var body: some View {
-        RealityView { content in
-            _ = content.subscribe(to: SceneEvents.Update.self) { _ in
-                Task { worldTransform = await visionPro.transformMatrix() }
-            }
-            // Add the initial RealityKit content
-            if let immersiveContentEntity = try? await Entity(named: "Immersive", in: realityKitContentBundle) {
-                content.add(immersiveContentEntity)
+        ZStack(alignment: .topLeading) {
+            RealityView { content in
+                _ = content.subscribe(to: SceneEvents.Update.self) { _ in
+                    Task { worldTransform = await visionPro.transformMatrix() }
+                }
                 
-                sphere = immersiveContentEntity.findEntity(named: "Sphere")
-                sphere?.scale = .init(repeating: sphereScale)
-                sphere?.components[MotionComponent.self] = MotionComponent()
-                sphere?.components[WanderComponent.self] = WanderComponent()
+                // Pass stats to systems
+                if let evoSystem = content.scene.system(for: EvolutionSystem.self) {
+                    evoSystem.setSimulationStats(stats)
+                }
+                if let motionSystem = content.scene.system(for: MotionSystem.self) {
+                    motionSystem.setSimulationStats(stats)
+                }
+                if let wanderSystem = content.scene.system(for: WanderSystem.self) {
+                    wanderSystem.setSimulationStats(stats)
+                }
+                if let hungerSystem = content.scene.system(for: HungerFearSystem.self) {
+                    hungerSystem.setSimulationStats(stats)
+                }
+                if let animSystem = content.scene.system(for: AnimationSpeedSystem.self) {
+                    animSystem.setSimulationStats(stats)
+                }
                 
-                let skydome = immersiveContentEntity.findEntity(named: "Skydome")
-                skydome?.scale = .init(-500, 500, 500)
-                
-                immersiveContentEntity.addChild(physicsAnchor)
-                immersiveContentEntity.addChild(tapAnchor)
-                
-                let tapPlane = Entity()
-                let collisionComponent = CollisionComponent(shapes: [ShapeResource.generateBox(width: 0.2, height: 0.2, depth: 0.01)])
-                tapPlane.name = "FoodPlane"
-                tapPlane.components.set(collisionComponent)
-                tapPlane.components.set(InputTargetComponent())
-                tapPlane.position = SIMD3(x: 0, y: 0, z: -0.2)
-                tapAnchor.addChild(tapPlane)
-                
-                // Add an ImageBasedLight for the immersive content
-                guard let resource = try? await EnvironmentResource(named: "ImageBasedLight") else { return }
-                let iblComponent = ImageBasedLightComponent(source: .single(resource), intensityExponent: 0.3)
-                immersiveContentEntity.components.set(iblComponent)
-                immersiveContentEntity.components.set(ImageBasedLightReceiverComponent(imageBasedLight: immersiveContentEntity))
-
-                // Put skybox here.  See example in World project available at
-                // https://developer.apple.com/
-//                let fishAnchor = AnchorEntity(world: .zero)
-//                immersiveContentEntity.addChild(fishAnchor)
-                fishes = await self.modelFactory.createModels(ofType: .fish, count: fishCount)
-                _ = fishes.enumerated().map{ (idx, fish) in
-                    fish.name = "fish_clone_\(idx)"
-                    fish.position = .spawnPoint(from: SIMD3(x: .random(in: 0..<2), y: .random(in: 0..<2), z: .random(in: 0..<2)), radius: 0.5)
-//                    adafish.position.y = Float.random(in: 0..<0.5)
-                    content.subscribe(to: CollisionEvents.Began.self, on: fish) { event in
-                        self.handleFishCollision(event: event, fish: event.entityA, other: event.entityB)
-                    }.store(in: &subscriptions)
-                    content.subscribe(to: CollisionEvents.Updated.self, on: fish) { event in
-                        self.handleFishCollision(event: event, fish: event.entityA, other: event.entityB)
-                    }.store(in: &subscriptions)
+                // Add the initial RealityKit content
+                if let immersiveContentEntity = try? await Entity(named: "Immersive", in: realityKitContentBundle) {
+                    content.add(immersiveContentEntity)
                     
-                    physicsAnchor.addChild(fish)
-                    fish.components[WanderComponent.self]?.attractor = sphere
-                }
-                
-                let shark = immersiveContentEntity.findEntity(named: "Swimming_Shark")!
-                ProtoTypeBuilder.addComponents(shark, modelType: .shark)
-                ProtoTypeBuilder.addAnimationComponents( shark, scalar: sharkAnimationScalar)
-                physicsAnchor.addChild(shark)
-                shark.components[WanderComponent.self]?.attractor = sphere
-                shark.scale = .init(repeating: 3)
-                sharks = [shark]
-//                sharks = await self.modelFactory.createModels(ofType: .shark, count: sharkCount)
-//                _ = sharks.enumerated().map{ (idx, shark) in
-//                    shark.name = "shark_\(idx)"
-//                    shark.position = .spawnPoint(from: SIMD3(x: 0, y: 0, z: 0), radius: 0.5)
-//                    shark.position.y = Float.random(in: 0..<0.5)
-////                    content.subscribe(to: CollisionEvents.Began.self, on: shark) { event in
-////                        self.handleFishCollision(event: event, fish: event.entityA, other: event.entityB)
-////                    }.store(in: &subscriptions)
-////                    content.subscribe(to: CollisionEvents.Updated.self, on: shark) { event in
-////                        self.handleFishCollision(event: event, fish: event.entityA, other: event.entityB)
-////                    }.store(in: &subscriptions)
-//                    
-//                    physicsAnchor.addChild(shark)
-//                }
-            }
-        }
-        .onChange(of: worldTransform, { _, _ in
-            let transform = Transform(matrix: worldTransform)
-            tapAnchor.transform = transform
-            handlePlayerTransform(transform)
-        })
-        .onReceive(timer) { input in
-            sphere?.components[MotionComponent.self]?.forces.append(MotionComponent.Force(acceleration: .random(in: -5...5), multiplier: 1, name: "wander"))
-        }
-        .gesture(
-            SpatialTapGesture()
-//                        .targetedToEntity(tapAnchor)
-                .targetedToAnyEntity()
-                .onEnded { value in
-                    print(value.entity)
-                    print(value.gestureValue.location3D)
-                    Task {
-                        let worldPosition: SIMD3<Float> = value.convert(value.location3D, from: .local, to: .scene)
-                        await addFood(atLocation: worldPosition)
+                    sphere = immersiveContentEntity.findEntity(named: "Sphere")
+                    sphere?.scale = .init(repeating: sphereScale)
+                    sphere?.components[MotionComponent.self] = MotionComponent()
+                    sphere?.components[WanderComponent.self] = WanderComponent()
+                    
+                    let skydome = immersiveContentEntity.findEntity(named: "Skydome")
+                    skydome?.scale = .init(-500, 500, 500)
+                    
+                    immersiveContentEntity.addChild(physicsAnchor)
+                    immersiveContentEntity.addChild(tapAnchor)
+                    
+                    let tapPlane = Entity()
+                    let collisionComponent = CollisionComponent(shapes: [ShapeResource.generateBox(width: 0.2, height: 0.2, depth: 0.01)])
+                    tapPlane.name = "FoodPlane"
+                    tapPlane.components.set(collisionComponent)
+                    tapPlane.components.set(InputTargetComponent())
+                    tapPlane.position = SIMD3(x: 0, y: 0, z: -0.2)
+                    tapAnchor.addChild(tapPlane)
+                    
+                    // Add an ImageBasedLight for the immersive content
+                    guard let resource = try? await EnvironmentResource(named: "ImageBasedLight") else { return }
+                    let iblComponent = ImageBasedLightComponent(source: .single(resource), intensityExponent: 0.3)
+                    immersiveContentEntity.components.set(iblComponent)
+                    immersiveContentEntity.components.set(ImageBasedLightReceiverComponent(imageBasedLight: immersiveContentEntity))
+
+                    fishes = await self.modelFactory.createModels(ofType: .fish, count: fishCount)
+                    _ = fishes.enumerated().map{ (idx, fish) in
+                        fish.name = "fish_clone_\(idx)"
+                        fish.position = .spawnPoint(from: SIMD3(x: .random(in: 0..<2), y: .random(in: 0..<2), z: .random(in: 0..<2)), radius: 0.5)
+                        content.subscribe(to: CollisionEvents.Began.self, on: fish) { event in
+                            self.handleFishCollision(event: event, fish: event.entityA, other: event.entityB)
+                        }.store(in: &subscriptions)
+                        content.subscribe(to: CollisionEvents.Updated.self, on: fish) { event in
+                            self.handleFishCollision(event: event, fish: event.entityA, other: event.entityB)
+                        }.store(in: &subscriptions)
+                        
+                        physicsAnchor.addChild(fish)
+                        fish.components[WanderComponent.self]?.attractor = sphere
                     }
-//                           playAnimation(entity: foodAnchor)
+                    
+                    let shark = immersiveContentEntity.findEntity(named: "Swimming_Shark")!
+                    ProtoTypeBuilder.addComponents(shark, modelType: .shark)
+                    ProtoTypeBuilder.addAnimationComponents( shark, scalar: sharkAnimationScalar)
+                    physicsAnchor.addChild(shark)
+                    shark.components[WanderComponent.self]?.attractor = sphere
+                    shark.scale = .init(repeating: 3)
+                    sharks = [shark]
                 }
-            )
-        .task {
-            await visionPro.runArkitSession()
+            }
+            .onChange(of: worldTransform, { _, _ in
+                let transform = Transform(matrix: worldTransform)
+                tapAnchor.transform = transform
+                handlePlayerTransform(transform)
+            })
+            .onReceive(timer) { input in
+                sphere?.components[MotionComponent.self]?.forces.append(MotionComponent.Force(acceleration: .random(in: -5...5), multiplier: 1, name: "wander"))
+            }
+            .gesture(
+                SpatialTapGesture()
+                    .targetedToAnyEntity()
+                    .onEnded { value in
+                        print(value.entity)
+                        print(value.gestureValue.location3D)
+                        Task {
+                            let worldPosition: SIMD3<Float> = value.convert(value.location3D, from: .local, to: .scene)
+                            await addFood(atLocation: worldPosition)
+                        }
+                    }
+                )
+            .task {
+                await visionPro.runArkitSession()
+            }
+            
+            DebugStatsView(stats: stats)
+                .padding(.top, 50)
+                .padding(.leading, 50)
         }
     }
     
     private func handlePlayerTransform(_ transform: Transform) {
-//        _ = fishes.map{
-//            $0.components[WanderComponent.self]?.attractor = transform.translation
-//        }
-//        _ = sharks.map{
-//            $0.components[WanderComponent.self]?.attractor = transform.translation
-//        }
-        // Player moved....
         if let spherePosition = sphere?.position {
-            // Invert the sphere scale to reverse the texture normals otherwise texture is
-            // not displayed when the player is inside the fishbowl
-            //
             let distance = transform.translation.distance(from: spherePosition)
             if distance < sphereScale {
                 sphere?.scale = .init(-sphereScale, sphereScale, sphereScale)
@@ -171,18 +166,11 @@ struct ImmersiveView: View {
     }
     
     private func handleFishCollision(event: Event, fish: Entity, other: Entity) {
-
         if other.components[KrillComponent.self] != nil,
            fish.components[HungerFearComponent.self] != nil
-//           let target = hungerComponent.currentFoodTarget,
-//           other == target
         {
-            // This fish got to its food target - eat it.
-            //
             other.removeFromParent()
             fish.components[HungerFearComponent.self]?.satiety += 1
-            // Any other fish that was gunning for this same food is out of luck.
-            //
             _=fishes.map{
                 $0.components[HungerFearComponent.self]?.foodPosition = nil
             }
@@ -190,35 +178,6 @@ struct ImmersiveView: View {
         else if other.components[PredatorComponent.self] != nil {
             print(other.availableAnimations)
         }
-//        else if other is HasSceneUnderstanding,
-//           other.components.has(CollisionComponent.self),
-//           var motion = fish.components[MotionComponent.self] {
-//            
-//            print("\(fish.name)  \(other.name) ")
-
-//            if let collisionUpdated = (event as? CollisionEvents.Began) {
-//
-//                // Clear out all the other forces, just for this frame, and send
-//                // the fish away from this real-world object.
-//                motion.forces.removeAll()
-//                motion.velocity = .zero
-//                var steer = SIMD3<Float>.zero
-//                let results = scene.raycast(origin: fish.position,
-//                                            direction: normalize(fish.position.vector(to: collisionUpdated.position)),
-//                                            length: 1.0,
-//                                            query: .nearest,
-//                                            mask: .sceneUnderstanding,
-//                                            relativeTo: nil)
-//
-//                if let result = results.first {
-//                    steer = normalize(result.normal)
-//
-//                    motion.forces.append(MotionComponent.Force(acceleration: steer, multiplier: settings.bonkWeight, name: "bonk"))
-//                    
-//                    fish.components[MotionComponent.self] = motion
-//                }
-//            }
-//        }
     }
     
     @discardableResult
@@ -231,50 +190,4 @@ struct ImmersiveView: View {
         }
         return food
     }
-    
-//    func playAnimation(entity: Entity) {
-//            let goUp = FromToByAnimation<Transform>(
-//                name: "goUp",
-//                from: .init(scale: .init(repeating: 1), translation: entity.position),
-//                to: .init(scale: .init(repeating: 1), translation: entity.position + .init(x: 0, y: 0.4, z: 0)),
-//                duration: 0.2,
-//                timing: .easeOut,
-//                bindTarget: .transform
-//            )
-//
-//            let pause = FromToByAnimation<Transform>(
-//                name: "pause",
-//                from: .init(scale: .init(repeating: 1), translation: entity.position + .init(x: 0, y: 0.4, z: 0)),
-//                to: .init(scale: .init(repeating: 1), translation: entity.position + .init(x: 0, y: 0.4, z: 0)),
-//                duration: 0.1,
-//                bindTarget: .transform
-//            )
-//
-//            let goDown = FromToByAnimation<Transform>(
-//                name: "goDown",
-//                from: .init(scale: .init(repeating: 1), translation: entity.position + .init(x: 0, y: 0.4, z: 0)),
-//                to: .init(scale: .init(repeating: 1), translation: entity.position),
-//                duration: 0.2,
-//                timing: .easeOut,
-//                bindTarget: .transform
-//            )
-//
-//            let goUpAnimation = try! AnimationResource
-//                .generate(with: goUp)
-//
-//            let pauseAnimation = try! AnimationResource
-//                .generate(with: pause)
-//
-//            let goDownAnimation = try! AnimationResource
-//                .generate(with: goDown)
-//
-//            let animation = try! AnimationResource.sequence(with: [goUpAnimation, pauseAnimation, goDownAnimation])
-//
-//            entity.playAnimation(animation, transitionDuration: 0.5)
-//        }
 }
-
-//#Preview {
-//    ImmersiveView()
-//        .previewLayout(.sizeThatFits)
-//}
