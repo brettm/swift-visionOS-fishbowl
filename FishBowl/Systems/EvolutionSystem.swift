@@ -39,7 +39,7 @@ class EvolutionSystem: System {
         
         for entity in fish {
             guard var lifespan = entity.components[LifespanComponent.self],
-                  var hunger = entity.components[HungerFearComponent.self] else { continue }
+                  let hunger = entity.components[HungerFearComponent.self] else { continue }
             
             lifespan.age += context.deltaTime
             
@@ -96,7 +96,6 @@ class EvolutionSystem: System {
                 }
             } else {
                 entity.components[LifespanComponent.self] = lifespan
-                entity.components[HungerFearComponent.self] = hunger
             }
         }
         
@@ -203,6 +202,8 @@ class EvolutionSystem: System {
             }
         }
         
+        let selectedParents = parents
+        
         // Spawn new generation
         Task {
             let newFishes = await ModelFactory().createModels(ofType: .fish, count: fishCount)
@@ -212,8 +213,8 @@ class EvolutionSystem: System {
                     if var newHunger = newFish.components[HungerFearComponent.self],
                        var newLifespan = newFish.components[LifespanComponent.self] {
                         
-                        if index < parents.count {
-                            let parent = parents[index]
+                        if index < selectedParents.count {
+                            let parent = selectedParents[index]
                             if let parentHunger = parent.components[HungerFearComponent.self],
                                let parentLifespan = parent.components[LifespanComponent.self] {
                                 newHunger.model.weights = self.mutateWeights(parentHunger.model.weights, mutationRate: self.baseMutationRate, fitness: parentLifespan.fitness)

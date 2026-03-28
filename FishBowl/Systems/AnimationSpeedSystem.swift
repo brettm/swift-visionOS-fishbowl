@@ -31,7 +31,7 @@ class AnimationSpeedSystem: RealityKit.System {
             let animationController = component.animationController
             // Make the animation play faster when the fish is swimming fast,
             // slower when it's swimming slowly.
-            var animationFramerate = max(0.001, motion.velocity.length) * component.scalar
+            let animationFramerate = max(0.001, motion.velocity.length) * component.scalar
             animationController.speed = animationFramerate
         }
     }

@@ -24,7 +24,7 @@ class WanderSystem: RealityKit.System {
 
         for entity in wanderers {
             guard var motion = entity.components[MotionComponent.self],
-                  var wander = entity.components[WanderComponent.self]
+                  let wander = entity.components[WanderComponent.self]
                 //let settings = (entity.components[SettingsComponent.self] as? SettingsComponent)?.settings 
             else { continue }
 
@@ -63,8 +63,6 @@ class WanderSystem: RealityKit.System {
             }
 
             entity.components[MotionComponent.self] = motion
-            entity.components[WanderComponent.self] = wander
         }
     }
 }
-

@@ -74,7 +74,7 @@ class FishManager: ObservableObject {
         // This would need to be integrated with your existing collision handling
         // For now, we'll create a placeholder - you'll need to adapt this to your existing collision system
         
-        let scene = physicsAnchor?.scene
+        _ = physicsAnchor?.scene
         // You would subscribe to collision events here similar to your existing code
     }
     
