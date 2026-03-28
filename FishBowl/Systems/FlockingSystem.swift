@@ -30,7 +30,7 @@ class FlockingSystem: RealityKit.System {
 
 //        let leader = context.scene.performQuery(Self.leaderQuery).map { $0 }.first
 
-        let flockers = context.scene.performQuery(Self.query)
+        let flockers = context.scene.performQuery(Self.query).map { $0 }
 
         for entity in flockers {
             guard var motion = entity.components[MotionComponent.self] else { continue }
@@ -57,7 +57,7 @@ class FlockingSystem: RealityKit.System {
         }
     }
 
-    private func separate(from entity1: Entity, _ entities: QueryResult<Entity>) -> SIMD3<Float> {
+    private func separate(from entity1: Entity, _ entities: [Entity]) -> SIMD3<Float> {
         guard let motion = entity1.components[MotionComponent.self]
 //        let settings = (entity1.components[SettingsComponent.self] as? SettingsComponent)?.settings
         else { return .zero }
@@ -101,7 +101,7 @@ class FlockingSystem: RealityKit.System {
         return steer
     }
 
-    private func align(from entity1: Entity, _ entities: QueryResult<Entity>) -> SIMD3<Float> {
+    private func align(from entity1: Entity, _ entities: [Entity]) -> SIMD3<Float> {
         guard let velocity = (entity1.components[MotionComponent.self])?.velocity else { return .zero }
 //        guard let settings = (entity1.components[SettingsComponent.self] as? SettingsComponent)?.settings else { return .zero }
 
@@ -127,7 +127,7 @@ class FlockingSystem: RealityKit.System {
         }
     }
 
-    private func cohere(from entity1: Entity, _ entities: QueryResult<Entity>) -> SIMD3<Float> {
+    private func cohere(from entity1: Entity, _ entities: [Entity]) -> SIMD3<Float> {
 //        guard let settings = (entity1.components[SettingsComponent.self] as? SettingsComponent)?.settings else { return .zero }
         var sum = SIMD3<Float>.zero
         var numNeighbors = 0
