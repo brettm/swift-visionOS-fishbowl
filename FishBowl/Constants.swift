@@ -24,7 +24,7 @@ let maxSteeringForce: Float = 10.0
 let fishAnimationScalar: Float = 400.0
 
 
-let fishCount = 100
+let fishCount = 20 // Reduced to 20 for faster evolution cycles during development
 let fishVisibility: Float = 3
 let fishModelWeightVariation: Float = 0.5
 

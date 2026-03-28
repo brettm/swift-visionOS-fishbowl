@@ -15,6 +15,7 @@ struct LifespanComponent: Component {
     var causeOfDeath: DeathCause? = nil
     var generation: Int = 0
     var childrenCount: Int = 0
+    var previousSatiety: Float = 0.5
 }
 
 enum DeathCause {
@@ -29,4 +30,10 @@ struct EvolutionStatsComponent: Component {
     var bestFitness: Float = 0
     var bestFitnessGeneration: Int = 0
     var populationHistory: [Int] = []
+    
+    var bestEverFitness: Float = 0
+    var bestEverWeights: [Float] = []
+    var bestEverBiases: [Float] = []
+    var generationDeathCount: Int = 0
+    var averageFitness: Float = 0
 }

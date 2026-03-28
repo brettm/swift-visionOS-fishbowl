@@ -3,14 +3,13 @@ import Foundation
 
 class EvolutionSystem: System {
     private static let fishQuery = EntityQuery(where: .has(LifespanComponent.self) && .has(HungerFearComponent.self))
+    private static let predatorQuery = EntityQuery(where: .has(PredatorComponent.self))
         
     static var dependencies: [SystemDependency] { [.after(HungerFearSystem.self)] }
     
     // Evolution parameters
-    private let minimumReproductionFitness: Float = 2.0
     private let maxLifespan: TimeInterval = 100.0 // seconds
     private let baseMutationRate: Float = 0.15
-    private let reproductionChance: Float = 0.7
     
     // Track stats in the system itself - no entity needed
     private var evolutionStats = EvolutionStatsComponent()
@@ -18,47 +17,87 @@ class EvolutionSystem: System {
     
     required init(scene: Scene) { }
     
-  
     func setFishManager(_ manager: FishManager) {
         self.fishManager = manager
     }
     
     func update(context: SceneUpdateContext) {
-            let fish = context.scene.performQuery(Self.fishQuery).map { $0 }
+        let fish = context.scene.performQuery(Self.fishQuery).map { $0 }
+        let predators = context.scene.performQuery(Self.predatorQuery).map { $0 }
+        
+        // 1. Emergency Repopulation Guard
+        if fish.count > 0 && fish.count < 5 {
+            triggerEmergencyRepopulation(in: context.scene, currentFish: fish.first!)
+        }
+        
+        // 2. Generation Advancement Trigger
+        let deathThreshold = Int(Float(fishCount) * 0.7)
+        if evolutionStats.generationDeathCount >= deathThreshold {
+            advanceGeneration(survivors: fish, scene: context.scene)
+            return // Skip normal update for this frame while we reset
+        }
+        
+        for entity in fish {
+            guard var lifespan = entity.components[LifespanComponent.self],
+                  var hunger = entity.components[HungerFearComponent.self] else { continue }
             
-            for entity in fish {
-                guard var lifespan = entity.components[LifespanComponent.self],
-                      let hunger = entity.components[HungerFearComponent.self] else { continue }
-                
-                lifespan.age += context.deltaTime
-                
-                // Update fitness based on current state
-                lifespan.fitness = calculateFitness(lifespan: lifespan, hunger: hunger)
-                
-                // Update best fitness stats
-                if lifespan.fitness > evolutionStats.bestFitness {
-                    evolutionStats.bestFitness = lifespan.fitness
-                    evolutionStats.bestFitnessGeneration = lifespan.generation
-                }
+            lifespan.age += context.deltaTime
             
-                // Check for death conditions
-                if shouldDie(lifespan: lifespan, hunger: hunger) {
-                    let cause = determineCauseOfDeath(lifespan: lifespan, hunger: hunger)
-                    lifespan.causeOfDeath = cause
-                    entity.components[LifespanComponent.self] = lifespan
-                    
-                    // Evolve and potentially spawn new fish
-                    if lifespan.fitness >= minimumReproductionFitness && Float.random(in: 0...1) < reproductionChance {
-                        evolveFromFish(entity)
-                    }
-                    
-                    // Remove the dead fish
-                    Task { @MainActor in
-                        entity.removeFromParent()
-                    }
-                } else {
-                    entity.components[LifespanComponent.self] = lifespan
+            // +0.1 per tick alive
+            lifespan.fitness += 0.1
+            
+            // +10.0 for successfully eating food (detect satiety increase)
+            if hunger.satiety > lifespan.previousSatiety {
+                lifespan.fitness += 10.0
+            }
+            lifespan.previousSatiety = hunger.satiety
+            
+            // +5.0 per tick spent within predator detection range while surviving
+            for predator in predators {
+                if entity.distance(from: predator) < sharkVisibility {
+                    lifespan.fitness += 5.0
+                    break
                 }
+            }
+            
+            // Update best fitness stats
+            if lifespan.fitness > evolutionStats.bestEverFitness {
+                evolutionStats.bestEverFitness = lifespan.fitness
+                evolutionStats.bestEverWeights = hunger.model.weights.inputToHiddenWeights + hunger.model.weights.hiddenToOutputWeights
+                evolutionStats.bestEverBiases = hunger.model.weights.inputToHiddenBias + hunger.model.weights.hiddenToOutputBias
+            }
+            
+            if lifespan.fitness > evolutionStats.bestFitness {
+                evolutionStats.bestFitness = lifespan.fitness
+                evolutionStats.bestFitnessGeneration = lifespan.generation
+            }
+        
+            // Check for death conditions
+            if shouldDie(lifespan: lifespan, hunger: hunger) {
+                let cause = determineCauseOfDeath(lifespan: lifespan, hunger: hunger)
+                lifespan.causeOfDeath = cause
+                
+                // Apply death penalties
+                if cause == .starvation {
+                    lifespan.fitness -= 20.0
+                } else if cause == .oldAge {
+                    lifespan.fitness -= 5.0
+                }
+                
+                // Apply children multiplier
+                lifespan.fitness += Float(lifespan.childrenCount) * 1.5
+                
+                entity.components[LifespanComponent.self] = lifespan
+                evolutionStats.generationDeathCount += 1
+                
+                // Remove the dead fish
+                Task { @MainActor in
+                    entity.removeFromParent()
+                }
+            } else {
+                entity.components[LifespanComponent.self] = lifespan
+                entity.components[HungerFearComponent.self] = hunger
+            }
         }
         
         // Update population history
@@ -67,36 +106,10 @@ class EvolutionSystem: System {
                                             fish.compactMap { $0.components[LifespanComponent.self]?.generation }.max() ?? 0)
     }
     
-    private func calculateFitness(lifespan: LifespanComponent, hunger: HungerFearComponent) -> Float {
-        var fitness: Float = 0
-        
-        // Base fitness from lifespan (longer life = better)
-        fitness += Float(lifespan.age) * 0.5
-        
-        // Bonus for maintaining good satiety
-        fitness += hunger.satiety * 3.0
-        
-        // Bonus for having children (successful genes)
-        fitness += Float(lifespan.childrenCount) * 10.0
-        
-        // Small penalty for old age to encourage efficient behaviors
-        if lifespan.age > maxLifespan * 0.7 {
-            fitness -= Float(lifespan.age - (maxLifespan * 0.7)) * 0.1
-        }
-        
-        return max(0, fitness)
-    }
-    
     private func shouldDie(lifespan: LifespanComponent, hunger: HungerFearComponent) -> Bool {
-        // Starvation
         if hunger.satiety <= 0 { return true }
-        
-        // Old age
         if lifespan.age > maxLifespan { return true }
-        
-        // Random accidents (very small chance)
         if Float.random(in: 0...1) < 0.0005 { return true }
-        
         return false
     }
     
@@ -106,44 +119,112 @@ class EvolutionSystem: System {
         return .accident
     }
     
-    private func evolveFromFish(_ deadFish: Entity) {
-        guard let deadLifespan = deadFish.components[LifespanComponent.self],
-              let deadHunger = deadFish.components[HungerFearComponent.self] else { return }
+    private func triggerEmergencyRepopulation(in scene: Scene, currentFish: Entity) {
+        guard let physicsAnchor = findPhysicsAnchor(in: currentFish) else { return }
         
-        // Create new fish
         Task {
-            let newFish = await createNewFish()
+            let newFishes = await ModelFactory().createModels(ofType: .fish, count: 10)
             
             await MainActor.run {
-                if var newHunger = newFish.components[HungerFearComponent.self],
-                   var newLifespan = newFish.components[LifespanComponent.self] {
-                    
-                    // Inherit and mutate weights
-                    newHunger.model.weights = mutateWeights(
-                        deadHunger.model.weights,
-                        mutationRate: baseMutationRate,
-                        fitness: deadLifespan.fitness
-                    )
-                    
-                    // Set up new fish lifespan
-                    newLifespan.generation = deadLifespan.generation + 1
-                    newLifespan.fitness = 0 // Start fresh
-                    
-                    newFish.components[HungerFearComponent.self] = newHunger
-                    newFish.components[LifespanComponent.self] = newLifespan
-                    
-                    // Update parent's child count (for fitness calculation)
-                    if var updatedDeadLifespan = deadFish.components[LifespanComponent.self] {
-                        updatedDeadLifespan.childrenCount += 1
-                        deadFish.components[LifespanComponent.self] = updatedDeadLifespan
+                for newFish in newFishes {
+                    if var newHunger = newFish.components[HungerFearComponent.self],
+                       var newLifespan = newFish.components[LifespanComponent.self] {
+                        
+                        // Use best ever weights if available
+                        if !self.evolutionStats.bestEverWeights.isEmpty {
+                            let inHidCount = newHunger.model.shape.inputNodesCount * newHunger.model.shape.hiddenNodesCount
+                            let hidOutCount = newHunger.model.shape.hiddenNodesCount * newHunger.model.shape.outputNodesCount
+                            
+                            if self.evolutionStats.bestEverWeights.count == inHidCount + hidOutCount {
+                                let inHidWeights = Array(self.evolutionStats.bestEverWeights[0..<inHidCount])
+                                let hidOutWeights = Array(self.evolutionStats.bestEverWeights[inHidCount...])
+                                
+                                let inHidBias = Array(self.evolutionStats.bestEverBiases[0..<newHunger.model.shape.hiddenNodesCount])
+                                let hidOutBias = Array(self.evolutionStats.bestEverBiases[newHunger.model.shape.hiddenNodesCount...])
+                                
+                                let bestWeights = ModelWeights(
+                                    inputToHiddenWeights: inHidWeights,
+                                    inputToHiddenBias: inHidBias,
+                                    hiddenToOutputWeights: hidOutWeights,
+                                    hiddenToOutputBias: hidOutBias
+                                )
+                                
+                                newHunger.model.weights = self.mutateWeights(bestWeights, mutationRate: self.baseMutationRate, fitness: self.evolutionStats.bestEverFitness)
+                            }
+                        }
+                        
+                        newLifespan.generation = self.evolutionStats.totalGenerations
+                        newFish.components[HungerFearComponent.self] = newHunger
+                        newFish.components[LifespanComponent.self] = newLifespan
+                        
+                        newFish.position = .spawnPoint(from: .zero, radius: 0.5)
+                        physicsAnchor.addChild(newFish)
                     }
-                    
-                    // Update stats
-                    self.evolutionStats.totalGenerations = max(self.evolutionStats.totalGenerations, newLifespan.generation)
-                    
-                    // Add to scene
-                    if let physicsAnchor = self.findPhysicsAnchor(in: deadFish) {
-                        newFish.position = .spawnPoint(from: deadFish.position, radius: 0.3)
+                }
+            }
+        }
+    }
+    
+    private func advanceGeneration(survivors: [Entity], scene: Scene) {
+        guard let firstFish = survivors.first, let physicsAnchor = findPhysicsAnchor(in: firstFish) else { return }
+        
+        // Calculate average fitness
+        let totalFitness = survivors.reduce(0) { $0 + ($1.components[LifespanComponent.self]?.fitness ?? 0) }
+        evolutionStats.averageFitness = survivors.isEmpty ? 0 : totalFitness / Float(survivors.count)
+        
+        evolutionStats.totalGenerations += 1
+        evolutionStats.generationDeathCount = 0
+        
+        // Tournament selection
+        var parents: [Entity] = []
+        if !survivors.isEmpty {
+            for _ in 0..<fishCount {
+                var tournament: [Entity] = []
+                for _ in 0..<min(3, survivors.count) {
+                    if let randomFish = survivors.randomElement() {
+                        tournament.append(randomFish)
+                    }
+                }
+                
+                let winner = tournament.max(by: { 
+                    ($0.components[LifespanComponent.self]?.fitness ?? 0) < ($1.components[LifespanComponent.self]?.fitness ?? 0) 
+                })
+                
+                if let winner = winner {
+                    parents.append(winner)
+                }
+            }
+        }
+        
+        // Remove old generation
+        for fish in survivors {
+            Task { @MainActor in
+                fish.removeFromParent()
+            }
+        }
+        
+        // Spawn new generation
+        Task {
+            let newFishes = await ModelFactory().createModels(ofType: .fish, count: fishCount)
+            
+            await MainActor.run {
+                for (index, newFish) in newFishes.enumerated() {
+                    if var newHunger = newFish.components[HungerFearComponent.self],
+                       var newLifespan = newFish.components[LifespanComponent.self] {
+                        
+                        if index < parents.count {
+                            let parent = parents[index]
+                            if let parentHunger = parent.components[HungerFearComponent.self],
+                               let parentLifespan = parent.components[LifespanComponent.self] {
+                                newHunger.model.weights = self.mutateWeights(parentHunger.model.weights, mutationRate: self.baseMutationRate, fitness: parentLifespan.fitness)
+                            }
+                        }
+                        
+                        newLifespan.generation = self.evolutionStats.totalGenerations
+                        newFish.components[HungerFearComponent.self] = newHunger
+                        newFish.components[LifespanComponent.self] = newLifespan
+                        
+                        newFish.position = .spawnPoint(from: .zero, radius: 0.5)
                         physicsAnchor.addChild(newFish)
                     }
                 }
@@ -153,25 +234,18 @@ class EvolutionSystem: System {
     
     private func mutateWeights(_ weights: ModelWeights, mutationRate: Float, fitness: Float) -> ModelWeights {
         var newWeights = weights
-        
-        // More successful fish mutate less (their genes are proven)
         let effectiveMutationRate = mutationRate / max(1.0, fitness * 0.5)
         
-        // Mutate input-to-hidden weights
         for i in 0..<newWeights.inputToHiddenWeights.count {
             if Float.random(in: 0...1) < effectiveMutationRate {
-                let mutation = Float.random(in: -0.3...0.3)
-                newWeights.inputToHiddenWeights[i] += mutation
-                // Keep weights in reasonable range
+                newWeights.inputToHiddenWeights[i] += Float.random(in: -0.3...0.3)
                 newWeights.inputToHiddenWeights[i] = max(-2.0, min(2.0, newWeights.inputToHiddenWeights[i]))
             }
         }
         
-        // Mutate hidden-to-output weights
         for i in 0..<newWeights.hiddenToOutputWeights.count {
             if Float.random(in: 0...1) < effectiveMutationRate {
-                let mutation = Float.random(in: -0.3...0.3)
-                newWeights.hiddenToOutputWeights[i] += mutation
+                newWeights.hiddenToOutputWeights[i] += Float.random(in: -0.3...0.3)
                 newWeights.hiddenToOutputWeights[i] = max(-2.0, min(2.0, newWeights.hiddenToOutputWeights[i]))
             }
         }
@@ -190,16 +264,7 @@ class EvolutionSystem: System {
         return nil
     }
     
-    private func createNewFish() async -> Entity {
-        let newFish = await ModelFactory().createModels(ofType: .fish, count: 1).first!
-        return newFish
-    }
-    
-    // Helper method to get current stats (useful for debugging/UI)
     func getCurrentStats() -> EvolutionStatsComponent {
         return evolutionStats
     }
 }
-
-
-
