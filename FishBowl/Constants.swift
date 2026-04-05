@@ -25,7 +25,7 @@ let fishAnimationScalar: Float = 400.0
 
 
 let fishCount = 20 // Reduced to 20 for faster evolution cycles during development
-let fishVisibility: Float = 3
+let fishVisibility: Float = 6
 let fishModelWeightVariation: Float = 0.5
 
 let foodSize: Float = 2

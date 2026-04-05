@@ -12,11 +12,11 @@ struct ContentView: View {
 
     @State private var showImmersiveSpace = false
     @State private var immersiveSpaceIsShown = false
+    @Environment(\.dismissWindow) private var dismissWindow
+    @Environment(\.openWindow) private var openWindow
 
     @Environment(\.openImmersiveSpace) var openImmersiveSpace
     @Environment(\.dismissImmersiveSpace) var dismissImmersiveSpace
-    @Environment(\.dismissWindow) private var dismissWindow
-    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         VStack {

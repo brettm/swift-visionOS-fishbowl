@@ -22,12 +22,10 @@ struct HungerFearComponent: RealityKit.Component {
     }
 }
 
-//struct FoodComponent: RealityKit.Component { }
 struct KrillEaterComponent: RealityKit.Component { }
 struct KrillComponent: RealityKit.Component { }
 
 class HungerFearSystem: RealityKit.System {
-    private var simulationStats: SimulationStats?
     
     required init(scene: RealityKit.Scene) { }
 
@@ -37,17 +35,13 @@ class HungerFearSystem: RealityKit.System {
     static let krillQuery = EntityQuery(where: .has(KrillComponent.self))
     static let predatorQuery = EntityQuery(where: .has(PredatorComponent.self) && .has(MotionComponent.self))
 
-    func setSimulationStats(_ stats: SimulationStats) {
-        self.simulationStats = stats
-    }
-
     func update(context: SceneUpdateContext) {
-        let speed = simulationStats?.simulationSpeed ?? 1.0
-        let dt = Float(context.deltaTime) * speed
-
+        // Access speed directly from shared stats — always in sync with HUD picker
         let krill = context.scene.performQuery(Self.krillQuery).map { $0 }
         guard !(krill.isEmpty) else { return }
         
+        let speed = SimulationStats.shared.simulationSpeed
+//        let dt = Float(context.deltaTime) * speed
         let eaters = context.scene.performQuery(Self.krillEaterQuery).map { $0 }
         let predators = context.scene.performQuery(Self.predatorQuery).map { $0 }
         
@@ -56,6 +50,7 @@ class HungerFearSystem: RealityKit.System {
                 var motion = eater.components[MotionComponent.self],
                 var hungerComponent = eater.components[HungerFearComponent.self]
             else { continue }
+            
 
             // Fish are opportunists so always pick the closest food!
             let distances = krill.indices.map{ (eater.distance(from: krill[$0]), $0) }.filter{ $0.0 < fishVisibility }.sorted(by: <)
@@ -63,7 +58,8 @@ class HungerFearSystem: RealityKit.System {
                 hungerComponent.foodPosition = krill[distance.1].position
             }
             
-            let hungerChange = hungerRate * (dt * dt)
+            let hungerChange = hungerRate * (Float(context.deltaTime) * Float(context.deltaTime))
+            
             hungerComponent.satiety = max(hungerComponent.satiety - hungerChange, 0)
             
             // If there's no food available, there's nothing to do.
@@ -103,7 +99,6 @@ class HungerFearSystem: RealityKit.System {
                     name: "hunger")
             )
             
-            // Store changes to the MotionComponent and HungerComponent
             eater.components[MotionComponent.self] = motion
             eater.components[HungerFearComponent.self] = hungerComponent
         }

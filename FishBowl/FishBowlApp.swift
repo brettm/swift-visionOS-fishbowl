@@ -15,8 +15,8 @@ enum FishBowlSystems {
         KrillComponent.registerComponent()
         KrillEaterComponent.registerComponent()
         HungerFearComponent.registerComponent()
-        LifespanComponent.registerComponent() // NEW
-        EvolutionStatsComponent.registerComponent() // NEW
+        LifespanComponent.registerComponent()
+        EvolutionStatsComponent.registerComponent()  // now a real ECS component
     }
 
     static private func registerSystems() {
@@ -26,7 +26,8 @@ enum FishBowlSystems {
         FlockingSystem.registerSystem()
         HungerFearSystem.registerSystem()
         PredatorSystem.registerSystem()
-        EvolutionSystem.registerSystem() // NEW
+        EvolutionSystem.registerSystem()
+        SimulationStatsSystem.registerSystem()       // bridge runs after everything
     }
 
     static public func register() {
@@ -38,12 +39,15 @@ enum FishBowlSystems {
 @main
 struct FishBowlApp: App {
     var body: some Scene {
+        // Launch window — opens the immersive space then dismisses itself
         WindowGroup(id: "ContentWindow") {
             ContentView()
                 .task { FishBowlSystems.register() }
         }
+        
         ImmersiveSpace(id: "ImmersiveSpace") {
             ImmersiveView()
-        }.immersionStyle(selection: .constant(.full), in: .full)
+        }
+        .immersionStyle(selection: .constant(.full), in: .full)
     }
 }

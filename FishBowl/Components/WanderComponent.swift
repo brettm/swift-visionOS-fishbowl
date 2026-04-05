@@ -10,8 +10,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 import RealityKit
 import Foundation
 
-struct WanderComponent: RealityKit.Component {
+struct WanderComponent: Component {
     var attractor: Entity?
-    // Each wanderer wanders at a different speed.
-    let wanderlust: Float = Float.random(in: 0.1..<1.0)
+    var wanderlust: Float = 1.0
+    var attractorOffset: SIMD3<Float> = .zero
 }

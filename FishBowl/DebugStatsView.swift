@@ -6,77 +6,83 @@
 import SwiftUI
 
 struct DebugStatsView: View {
+    // @Observable means SwiftUI automatically re-renders when any
+    // property accessed in body changes — no timer or copied vars needed
     var stats: SimulationStats
-    @State private var isVisible: Bool = true
-    
-    // Timer to throttle UI updates to once per second
-    @State private var displayGeneration: Int = 0
-    @State private var displayPopulation: Int = 0
-    @State private var displayAvgFitness: Float = 0.0
-    @State private var displayBestFitness: Float = 0.0
-    @State private var displayDeaths: Int = 0
-    @State private var displayStarvation: Int = 0
-    @State private var displayOldAge: Int = 0
-    @State private var displayAccident: Int = 0
-    
-    let timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
     
     var body: some View {
-        VStack(alignment: .leading) {
-            Button(action: {
-                isVisible.toggle()
-            }) {
-                Text(isVisible ? "Hide Stats" : "Show Stats")
-                    .font(.caption)
-            }
-            .padding(.bottom, 4)
+        VStack(alignment: .leading, spacing: 12) {
             
-            if isVisible {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Gen: \(displayGeneration) | Pop: \(displayPopulation)")
-                        .font(.headline)
-                    
-                    Text("Avg Fitness: \(String(format: "%.1f", displayAvgFitness))")
-                    Text("Best Ever Fitness: \(String(format: "%.1f", displayBestFitness))")
-                    
-                    Divider().background(Color.white)
-                    
-                    Text("Deaths This Gen: \(displayDeaths)")
-                    Text("Starvation: \(displayStarvation)")
-                    Text("Old Age: \(displayOldAge)")
-                    Text("Accident: \(displayAccident)")
-                    
-                    Divider().background(Color.white)
-                    
-                    Text("Simulation Speed")
-                        .font(.caption)
-                    Picker("Speed", selection: Bindable(stats).simulationSpeed) {
-                        Text("1x").tag(Float(1.0))
-                        Text("2x").tag(Float(2.0))
-                        Text("5x").tag(Float(5.0))
-                        Text("10x").tag(Float(10.0))
-                    }
-                    .pickerStyle(.segmented)
-                }
-                .padding()
-                .background(Color.black.opacity(0.7))
-                .cornerRadius(10)
-                .foregroundColor(.white)
+            Text("🐟 Fish Bowl Evolution")
+                .font(.headline)
+                .padding(.bottom, 2)
+            
+            Divider()
+            
+            HStack {
+                statLabel("Generation", value: "\(stats.currentGeneration)")
+                Spacer()
+                statLabel("Population", value: "\(stats.populationCount)")
             }
+            
+            HStack {
+                statLabel("Avg Fitness", value: String(format: "%.1f", stats.averageFitness))
+                Spacer()
+                statLabel("Best Ever", value: String(format: "%.1f", stats.bestEverFitness))
+            }
+            
+            Divider()
+            
+            Text("Deaths This Generation: \(stats.deathsThisGeneration)")
+                .font(.subheadline)
+            
+            HStack(spacing: 16) {
+                deathLabel("🍽️ Starved", count: stats.starvationDeaths)
+                deathLabel("👴 Old Age", count: stats.oldAgeDeaths)
+                deathLabel("💥 Accident", count: stats.accidentDeaths)
+            }
+            
+            Divider()
+            
+            Text("Simulation Speed")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            
+            Picker("Speed", selection: Bindable(stats).simulationSpeed) {
+                Text("1x").tag(Float(1.0))
+                Text("2x").tag(Float(2.0))
+                Text("5x").tag(Float(5.0))
+                Text("10x").tag(Float(10.0))
+            }
+            .pickerStyle(.segmented)
         }
         .padding()
-        .frame(maxWidth: 300)
-        .onReceive(timer) { _ in
-            if isVisible {
-                displayGeneration = stats.currentGeneration
-                displayPopulation = stats.populationCount
-                displayAvgFitness = stats.averageFitness
-                displayBestFitness = stats.bestEverFitness
-                displayDeaths = stats.deathsThisGeneration
-                displayStarvation = stats.starvationDeaths
-                displayOldAge = stats.oldAgeDeaths
-                displayAccident = stats.accidentDeaths
-            }
+        .frame(width: 300)
+    }
+    
+    @ViewBuilder
+    private func statLabel(_ title: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.title3)
+                .fontWeight(.semibold)
+                .monospacedDigit()
+        }
+    }
+    
+    @ViewBuilder
+    private func deathLabel(_ title: String, count: Int) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            Text("\(count)")
+                .font(.body)
+                .fontWeight(.medium)
+                .monospacedDigit()
         }
     }
 }

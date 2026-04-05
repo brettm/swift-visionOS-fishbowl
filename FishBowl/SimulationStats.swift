@@ -6,6 +6,7 @@
 import Foundation
 import SwiftUI
 
+@MainActor
 @Observable
 class SimulationStats {
     var currentGeneration: Int = 0
@@ -19,4 +20,6 @@ class SimulationStats {
     var accidentDeaths: Int = 0
     
     var simulationSpeed: Float = 1.0
+    
+    static var shared = SimulationStats()
 }

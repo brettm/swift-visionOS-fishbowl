@@ -17,6 +17,9 @@
 		8BBA2B7A2B98F94900ECA666 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8BBA2B792B98F94900ECA666 /* Assets.xcassets */; };
 		8BBA2B7D2B98F94900ECA666 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8BBA2B7C2B98F94900ECA666 /* Preview Assets.xcassets */; };
 		8BBA2B882B98F94900ECA666 /* FishBowlTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BBA2B872B98F94900ECA666 /* FishBowlTests.swift */; };
+		8BC633922F7BBA1C0071D153 /* SimulationStatsSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC633912F7BBA1C0071D153 /* SimulationStatsSystem.swift */; };
+		8BE2FCDE2F77C8CD00FF5B62 /* DebugStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE2FCDD2F77C8CD00FF5B62 /* DebugStatsView.swift */; };
+		8BE2FCE02F77C8EA00FF5B62 /* SimulationStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE2FCDF2F77C8EA00FF5B62 /* SimulationStats.swift */; };
 		8BF3CCAA2B99E75B000DE9C8 /* fish_clown in Resources */ = {isa = PBXBuildFile; fileRef = 8BF3CCA92B99E75B000DE9C8 /* fish_clown */; };
 		8BF3CCAC2B99EA51000DE9C8 /* VectorMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF3CCAB2B99EA50000DE9C8 /* VectorMath.swift */; };
 		8BF3CCB12B99FF50000DE9C8 /* MotionComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF3CCB02B99FF50000DE9C8 /* MotionComponent.swift */; };
@@ -61,6 +64,9 @@
 		8BBA2B7E2B98F94900ECA666 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8BBA2B832B98F94900ECA666 /* FishBowlTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FishBowlTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8BBA2B872B98F94900ECA666 /* FishBowlTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FishBowlTests.swift; sourceTree = "<group>"; };
+		8BC633912F7BBA1C0071D153 /* SimulationStatsSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulationStatsSystem.swift; sourceTree = "<group>"; };
+		8BE2FCDD2F77C8CD00FF5B62 /* DebugStatsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DebugStatsView.swift; path = FishBowl/DebugStatsView.swift; sourceTree = "<group>"; };
+		8BE2FCDF2F77C8EA00FF5B62 /* SimulationStats.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SimulationStats.swift; path = FishBowl/SimulationStats.swift; sourceTree = "<group>"; };
 		8BF3CCA92B99E75B000DE9C8 /* fish_clown */ = {isa = PBXFileReference; lastKnownFileType = folder; path = fish_clown; sourceTree = "<group>"; };
 		8BF3CCAB2B99EA50000DE9C8 /* VectorMath.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VectorMath.swift; sourceTree = "<group>"; };
 		8BF3CCB02B99FF50000DE9C8 /* MotionComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MotionComponent.swift; sourceTree = "<group>"; };
@@ -111,6 +117,8 @@
 		8BBA2B612B98F94000ECA666 = {
 			isa = PBXGroup;
 			children = (
+				8BE2FCDF2F77C8EA00FF5B62 /* SimulationStats.swift */,
+				8BE2FCDD2F77C8CD00FF5B62 /* DebugStatsView.swift */,
 				8BBA2B6C2B98F94000ECA666 /* FishBowl */,
 				8BBA2B6D2B98F94000ECA666 /* Packages */,
 				8BBA2B862B98F94900ECA666 /* FishBowlTests */,
@@ -205,6 +213,7 @@
 				8BF3CCC12B9B5B78000DE9C8 /* HungerFearSystem.swift */,
 				8BB124582C8FAA3D000474AF /* PredatorSystem.swift */,
 				8BF9A5902EC4991C008DD77E /* EvolutionSystem.swift */,
+				8BC633912F7BBA1C0071D153 /* SimulationStatsSystem.swift */,
 			);
 			path = Systems;
 			sourceTree = "<group>";
@@ -346,12 +355,15 @@
 				8BF3CCB62B9A0344000DE9C8 /* WanderComponent.swift in Sources */,
 				8BF3CCBA2B9A0470000DE9C8 /* Entity+Distance.swift in Sources */,
 				8BB124572C8F4E39000474AF /* Fish.swift in Sources */,
+				8BE2FCE02F77C8EA00FF5B62 /* SimulationStats.swift in Sources */,
 				8BBA2B722B98F94000ECA666 /* FishBowlApp.swift in Sources */,
 				8BF3CCC02B9B08C7000DE9C8 /* FlockingSystem.swift in Sources */,
 				8BB124592C8FAA3D000474AF /* PredatorSystem.swift in Sources */,
+				8BE2FCDE2F77C8CD00FF5B62 /* DebugStatsView.swift in Sources */,
 				8BF3CCB42B9A0163000DE9C8 /* MotionSystem.swift in Sources */,
 				8BBA2B762B98F94000ECA666 /* ImmersiveView.swift in Sources */,
 				8BF9D9A92C3C1C0500C4E19C /* OrganismModel.swift in Sources */,
+				8BC633922F7BBA1C0071D153 /* SimulationStatsSystem.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

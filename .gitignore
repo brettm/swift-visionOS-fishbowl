@@ -95,3 +95,4 @@ iOSInjectionProject/
 .DS_Store
 .AppleDouble
 .LSOverride
+.aider*

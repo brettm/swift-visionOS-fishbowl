@@ -132,13 +132,11 @@ class ModelFactory {
     private var fishFactory: EntityFactory!
     private var foodFactory: EntityFactory!
     
-    public init() {
-        Task {
-            let foodPrototype = await ProtoTypeBuilder.buildPrototype(modelType: .krill)
-            let fishProtoype = await ProtoTypeBuilder.buildPrototype(modelType: .fish)
-            foodFactory = EntityFactory(protoType: foodPrototype)
-            fishFactory = EntityFactory(protoType: fishProtoype)
-        }
+    public init() async {
+        let foodPrototype = await ProtoTypeBuilder.buildPrototype(modelType: .krill)
+        let fishProtoype = await ProtoTypeBuilder.buildPrototype(modelType: .fish)
+        foodFactory = EntityFactory(protoType: foodPrototype)
+        fishFactory = EntityFactory(protoType: fishProtoype)
     }
     
     public func createModels(ofType type: ModelType, count: Int) async -> [Entity] {

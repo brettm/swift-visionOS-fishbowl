@@ -9,87 +9,194 @@ import RealityKit
 import Foundation
 
 @MainActor
-class FishManager: ObservableObject {
-    private let modelFactory = ModelFactory()
+class FishManager {
+    
+    var onFishSpawned: ((Entity) -> Void)?
+    
+    private let modelFactory: ModelFactory
     private weak var physicsAnchor: Entity?
     private var collisionSubscriptions: [EventSubscription] = []
     
-    @Published private(set) var fishCount: Int = 0
-    @Published private(set) var totalFishCreated: Int = 0
+    // Krill management
+    private var krillSpawnTimer: TimeInterval = 0
+    private let krillSpawnInterval: TimeInterval = 3.0  // spawn every 3 seconds
+    private let maxKrillCount: Int = 30                 // enough for a bowl of radius 10
+    // Krill spawn radius relative to fish centroid — keeps food in
+    // the neighbourhood the fish are actually swimming in
+    private let krillSpawnRadius: Float = 2.0
     
-    init(physicsAnchor: Entity) {
+    private(set) var activeFish: [Entity] = []
+    private(set) var totalFishCreated: Int = 0
+    
+    init(physicsAnchor: Entity) async {
         self.physicsAnchor = physicsAnchor
+        self.modelFactory = await ModelFactory()
     }
     
-    func createInitialFish(count: Int) async -> [Entity] {
+    // MARK: - Fish Creation
+    
+    func createInitialFish(count: Int, attractor: Entity?, subscribeToCollisions: (Entity) -> Void) async {
         let fishes = await modelFactory.createModels(ofType: .fish, count: count)
-        
         for (idx, fish) in fishes.enumerated() {
-            await setupFish(fish, name: "fish_initial_\(idx)")
-        }
-        
-        await MainActor.run {
-            fishCount = fishes.count
-            totalFishCreated += fishes.count
-        }
-        
-        return fishes
-    }
-    
-    func createNewFish(from parent: Entity? = nil) async -> Entity? {
-        guard let newFish = await modelFactory.createModels(ofType: .fish, count: 1).first else {
-            return nil
-        }
-        
-        let parentName = parent?.name ?? "system"
-        let fishName = "fish_gen_\(totalFishCreated + 1)_from_\(parentName)"
-        
-        await setupFish(newFish, name: fishName)
-        
-        await MainActor.run {
-            fishCount += 1
-            totalFishCreated += 1
-        }
-        
-        return newFish
-    }
-    
-    private func setupFish(_ fish: Entity, name: String) async {
-        await MainActor.run {
-            fish.name = name
-            fish.position = .spawnPoint(from: SIMD3<Float>.zero, radius: 0.5)
-            
-            // Add lifespan component
-            fish.components[LifespanComponent.self] = LifespanComponent()
-            
-            // Setup collision handling
-            setupCollisionHandling(for: fish)
-            
-            // Add to physics anchor
+            fish.name = "fish_initial_\(idx)"
+            fish.position = .spawnPoint(
+                from: SIMD3(x: .random(in: 0..<2), y: .random(in: 0..<2), z: .random(in: 0..<2)),
+                radius: 0.5
+            )
+            fish.components[WanderComponent.self]?.attractor = attractor
+            subscribeToCollisions(fish)
             physicsAnchor?.addChild(fish)
+            activeFish.append(fish)
+            onFishSpawned?(fish)
         }
+        totalFishCreated += fishes.count
     }
     
-    private func setupCollisionHandling(for fish: Entity) {
-        // This would need to be integrated with your existing collision handling
-        // For now, we'll create a placeholder - you'll need to adapt this to your existing collision system
+    func spawnGeneration(
+        count: Int,
+        generation: Int,
+        parentData: [ParentWeightData],
+        mutate: (ModelWeights, Float) -> ModelWeights
+    ) async {
+        removeAllFish()
         
-        _ = physicsAnchor?.scene
-        // You would subscribe to collision events here similar to your existing code
+        let newFishes = await modelFactory.createModels(ofType: .fish, count: count)
+        for (index, fish) in newFishes.enumerated() {
+            fish.name = "fish_gen\(generation)_\(index)"
+            fish.position = .spawnPoint(from: .zero, radius: 0.5)
+            
+            if index < parentData.count,
+               var hunger = fish.components[HungerFearComponent.self] {
+                hunger.model.weights = mutate(parentData[index].weights, parentData[index].fitness)
+                fish.components[HungerFearComponent.self] = hunger
+            }
+            
+            if var lifespan = fish.components[LifespanComponent.self] {
+                lifespan.generation = generation
+                fish.components[LifespanComponent.self] = lifespan
+            }
+            
+            physicsAnchor?.addChild(fish)
+            activeFish.append(fish)
+            onFishSpawned?(fish)
+        }
+        totalFishCreated += newFishes.count
     }
+    
+    func spawnEmergencyFish(
+        count: Int,
+        generation: Int,
+        bestWeights: ModelWeights?,
+        bestFitness: Float,
+        mutate: (ModelWeights, Float) -> ModelWeights
+    ) async {
+        let newFishes = await modelFactory.createModels(ofType: .fish, count: count)
+        for (index, fish) in newFishes.enumerated() {
+            fish.name = "fish_emergency_gen\(generation)_\(index)"
+            fish.position = .spawnPoint(from: .zero, radius: 0.5)
+            
+            if let best = bestWeights,
+               var hunger = fish.components[HungerFearComponent.self] {
+                hunger.model.weights = mutate(best, bestFitness)
+                fish.components[HungerFearComponent.self] = hunger
+            }
+            
+            if var lifespan = fish.components[LifespanComponent.self] {
+                lifespan.generation = generation
+                fish.components[LifespanComponent.self] = lifespan
+            }
+            
+            physicsAnchor?.addChild(fish)
+            activeFish.append(fish)
+            onFishSpawned?(fish)
+        }
+        totalFishCreated += newFishes.count
+    }
+    
+    // MARK: - Fish Removal
     
     func removeFish(_ fish: Entity) {
-        Task { @MainActor in
-            fish.removeFromParent()
-            fishCount = max(0, fishCount - 1)
-        }
+        fish.removeFromParent()
+        activeFish.removeAll { $0 == fish }
     }
     
-    func getEvolutionCandidate(from deadFish: Entity) -> Entity? {
-        guard let lifespan = deadFish.components[LifespanComponent.self],
-              lifespan.fitness >= 2.0 else { // minimum fitness threshold
-            return nil
-        }
-        return deadFish
+    func removeAllFish() {
+        activeFish.forEach { $0.removeFromParent() }
+        activeFish.removeAll()
     }
+    
+    // MARK: - Krill
+    
+    /// Called each frame from ImmersiveView's RealityView update closure.
+    /// Rate-limited internally — only spawns every krillSpawnInterval seconds.
+    func updateKrill(deltaTime: TimeInterval) async {
+        krillSpawnTimer += deltaTime
+        guard krillSpawnTimer >= krillSpawnInterval else { return }
+        krillSpawnTimer = 0
+        
+        let existingKrill = physicsAnchor?.children.filter {
+            $0.components[KrillComponent.self] != nil
+        }.count ?? 0
+        
+        guard existingKrill < maxKrillCount else { return }
+        
+        let spawnCount = min(3, maxKrillCount - existingKrill)
+        await spawnKrill(count: spawnCount, at: nil)
+    }
+    
+    /// Spawns krill near the current fish centroid so food always appears
+    /// where fish are actually swimming — within fishVisibility range.
+    /// Pass a specific location for tap-to-feed, nil for auto-spawn.
+    @discardableResult
+    func spawnKrill(count: Int, at location: SIMD3<Float>?) async -> [Entity] {
+        let foods = await modelFactory.createModels(ofType: .krill, count: count)
+        
+        // Calculate fish centroid for smart auto-spawn positioning
+        let spawnOrigin: SIMD3<Float>
+        if let location {
+            spawnOrigin = location
+        } else if !activeFish.isEmpty {
+            // Spawn near where fish are actually swimming
+            let sum = activeFish.reduce(SIMD3<Float>.zero) { $0 + $1.position }
+            spawnOrigin = sum / Float(activeFish.count)
+        } else {
+            spawnOrigin = physicsAnchor?.position ?? .zero
+        }
+        
+        for (index, food) in foods.enumerated() {
+            food.name = "krill_\(totalFishCreated)_\(index)"
+            food.position = .spawnPoint(from: spawnOrigin, radius: krillSpawnRadius)
+            // Use preservingWorldTransform for tap-to-feed so position
+            // is interpreted in world space, not anchor-local space
+            physicsAnchor?.addChild(food, preservingWorldTransform: location != nil)
+        }
+        print("[Krill] spawned \(foods.count) at \(spawnOrigin) — anchor children: \(physicsAnchor?.children.count ?? 0)")
+        return foods
+    }
+    
+    // MARK: - Collision Handling
+    
+    func handleFishCollision(fish: Entity, other: Entity) {
+        if other.components[KrillComponent.self] != nil,
+           fish.components[HungerFearComponent.self] != nil {
+            print("[Collision] fish ate krill — satiety before: \(fish.components[HungerFearComponent.self]?.satiety ?? -1)")
+            other.removeFromParent()
+            fish.components[HungerFearComponent.self]?.satiety += 1
+            print("[Collision] satiety after: \(fish.components[HungerFearComponent.self]?.satiety ?? -1)")
+            // Clear cached food position so all fish re-evaluate next tick
+            activeFish.forEach {
+                $0.components[HungerFearComponent.self]?.foodPosition = nil
+            }
+        } else if other.components[PredatorComponent.self] != nil {
+            print(other.availableAnimations)
+        }
+    }
+}
+
+// MARK: - Supporting Types
+
+/// Sendable snapshot of a parent's genetic material for safe cross-Task capture
+struct ParentWeightData: Sendable {
+    let weights: ModelWeights
+    let fitness: Float
 }
